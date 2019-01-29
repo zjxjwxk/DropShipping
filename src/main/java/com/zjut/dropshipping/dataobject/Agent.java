@@ -20,6 +20,7 @@ public class Agent {
     private Integer id;
     private String name;
     private String phone;
+    private String password;
     private String identityNumber;
     private String region;
     private String state;
@@ -30,9 +31,10 @@ public class Agent {
     public Agent() {
     }
 
-    public Agent(String name, String phone, String identityNumber, String region, String state, String externalShop) {
+    public Agent(String name, String phone, String password, String identityNumber, String region, String state, String externalShop) {
         this.name = name;
         this.phone = phone;
+        this.password = password;
         this.identityNumber = identityNumber;
         this.region = region;
         this.state = state;
