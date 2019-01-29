@@ -7,6 +7,6 @@ import com.zjut.dropshipping.dataobject.Agent;
  */
 public interface IAgentService {
 
-    public Agent register(String name, String phone, String identityNumber
+    Agent register(String name, String phone, String identityNumber
             , String region, String state, String externalShop);
 }
