@@ -25,7 +25,7 @@ public class AgentRepositoryTest {
     @Test
     @Transactional
     public void saveTest() {
-        Agent agent = new Agent("Wxk", "12311111111", "332624199811111111"
+        Agent agent = new Agent("Wxk", "12311111111", "12345678", "332624199811111111"
                 , "浙江省台州市", "正常", "Apple官方旗舰店");
         Agent result = repository.save(agent);
         Assert.assertNotNull(result);
