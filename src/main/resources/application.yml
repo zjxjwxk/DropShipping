@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: smart
+    password: sjl123456
+    url: jdbc:mysql://39.108.183.2/smart?characterEncoding=utf-8&useSSL=false
+  jpa:
+    show-sql: true
