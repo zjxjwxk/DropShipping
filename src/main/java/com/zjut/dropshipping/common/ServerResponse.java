@@ -1,14 +1,17 @@
 package com.zjut.dropshipping.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 
 /**
  * 服务响应对象，作为JSON对象返回
+ * 忽略值为null的字段
  * @author zjxjwxk
  * @param <T>
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ServerResponse<T> implements Serializable {
 
     private int status;
