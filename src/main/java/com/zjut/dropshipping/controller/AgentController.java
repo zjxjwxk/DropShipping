@@ -1,10 +1,12 @@
 package com.zjut.dropshipping.controller;
 
+import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
-import com.zjut.dropshipping.service.IAgentService;
+import com.zjut.dropshipping.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -14,16 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/agent")
 public class AgentController {
 
-    private final IAgentService iAgentService;
+    private final AgentService agentService;
 
     @Autowired
-    public AgentController(IAgentService iAgentService) {
-        this.iAgentService = iAgentService;
+    public AgentController(AgentService agentService) {
+        this.agentService = agentService;
     }
 
     @PostMapping("/register")
-    public Agent register(String name, String phone, String identityNumber
-            , String region, String state, String externalShop) {
-        return iAgentService.register(name, phone, identityNumber, region, state, externalShop);
+    @ResponseBody
+    public ServerResponse<String> register(Agent agent) {
+        return agentService.register(agent);
     }
 }
