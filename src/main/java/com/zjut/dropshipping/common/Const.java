@@ -21,11 +21,4 @@ public class Const {
         String FROZEN = "冻结";
     }
 
-    public interface UploadType {
-
-        String IDCARD_1 = "IDCard-1";
-
-        String IDCARD_2 = "IDCard-2";
-    }
-
 }
