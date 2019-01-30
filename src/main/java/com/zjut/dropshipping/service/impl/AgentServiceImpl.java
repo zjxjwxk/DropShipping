@@ -38,12 +38,14 @@ public class AgentServiceImpl implements AgentService {
             return validResponse;
         }
 
+        // 检验店铺名
         validResponse = this.checkValid(agent.getExternalShop(), Const.EXTERNAL_SHOP);
         if (validResponse.isError()) {
             return validResponse;
         }
 
-        agent.setState(Const.State.NORMAL);
+        // 设置状态为未批准
+        agent.setState(Const.State.UNAPPROVED);
 
         // MD5加密
         agent.setPassword(MD5Util.MD5EncodeUtf8(agent.getPassword()));
@@ -51,6 +53,23 @@ public class AgentServiceImpl implements AgentService {
         agentRepository.save(agent);
 
         return ServerResponse.createBySuccessMessage("注册成功");
+    }
+
+    @Override
+    public ServerResponse<Agent> login(String phone, String password) {
+        int resultCount = agentRepository.countByPhone(phone);
+        if (resultCount == 0) {
+            return ServerResponse.createByErrorMessage("该手机号码未被注册");
+        }
+
+        String md5Password = MD5Util.MD5EncodeUtf8(password);
+        Agent agent = agentRepository.findByPhoneAndPassword(phone, md5Password);
+        if (agent == null) {
+            return ServerResponse.createByErrorMessage("用户名或密码错误");
+        }
+
+        agent.setPassword(StringUtils.EMPTY);
+        return ServerResponse.createBySuccess("登陆成功", agent);
     }
 
     private ServerResponse<String> checkValid(String str, String type) {
