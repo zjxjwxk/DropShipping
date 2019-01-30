@@ -13,4 +13,6 @@ public interface AgentRepository extends JpaRepository<Agent, Integer> {
     Integer countByIdentityNumber(String identityNumber);
 
     Integer countByExternalShop(String externalShop);
+
+    Agent findByPhoneAndPassword(String phone, String password);
 }
