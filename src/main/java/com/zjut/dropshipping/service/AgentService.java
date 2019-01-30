@@ -9,4 +9,7 @@ import com.zjut.dropshipping.dataobject.Agent;
 public interface AgentService {
 
     ServerResponse<String> register(Agent agent);
+
+    ServerResponse<Agent> login(String phone, String password);
+
 }
