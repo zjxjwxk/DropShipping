@@ -12,8 +12,9 @@ public interface FileService {
      * @param file 上传的文件
      * @param path 本地暂存路径
      * @param type 上传文件类别(需要进入的文件夹名)
-     * @param phone 用户的电话(需要创建的文件夹名)
+     * @param id 用户id(需要创建的文件夹名)
+     * @param identityNumber 身份证号(包含在文件名中)
      * @return 上传文件的完整文件名
      */
-    String upload(MultipartFile file, String path, String type, String phone);
+    String IDCardUpload(MultipartFile file, String path, String type, Integer id, String identityNumber);
 }

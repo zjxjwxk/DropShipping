@@ -1,5 +1,6 @@
 package com.zjut.dropshipping.service.impl;
 
+import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.service.FileService;
 import com.zjut.dropshipping.utils.FTPUtil;
 import org.slf4j.Logger;
@@ -21,11 +22,17 @@ public class FileServiceImpl implements FileService {
     private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
     @Override
-    public String upload(MultipartFile file, String path, String type, String phone) {
+    public String IDCardUpload(MultipartFile file, String path, String type, Integer id, String identityNumber) {
         String fileName = file.getOriginalFilename();
         // 扩展名
         String fileExtensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
-        String uploadFileName = phone + "-" + type + "." + fileExtensionName;
+        String uploadFileName = null;
+        if (type.equals(Const.UploadType.IDENTITY_CARD_1)) {
+            uploadFileName = identityNumber + "-front" + "." + fileExtensionName;
+        }else {
+            uploadFileName = identityNumber + "-back" + "." + fileExtensionName;
+        }
+
         logger.info("开始上传文件，上传文件的文件名:{}，上传的路径:{}，新文件名:{}", fileName, path, uploadFileName);
 
         File fileDir = new File(path);
@@ -41,7 +48,7 @@ public class FileServiceImpl implements FileService {
 
             List<File> fileList = new ArrayList<>();
             fileList.add(targetFile);
-            FTPUtil.upload(type, fileList, phone);
+            FTPUtil.upload(Const.UploadType.IDENTITY, fileList, id, identityNumber);
             // 已经上传到ftp服务器上
 
             targetFile.delete();

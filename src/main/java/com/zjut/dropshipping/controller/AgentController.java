@@ -60,8 +60,8 @@ public class AgentController {
         }
         // 填充业务
         String path = request.getSession().getServletContext().getRealPath("upload");
-        String targetFileName = fileService.upload(file, path, type,
-                ((Agent) session.getAttribute(Const.CURRENT_USER)).getPhone());
+        String targetFileName = fileService.IDCardUpload(file, path, type, agent.getId(),
+                agent.getIdentityNumber());
         String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
 
         Map fileMap = new HashMap(2);

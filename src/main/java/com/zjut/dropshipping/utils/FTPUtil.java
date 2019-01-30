@@ -33,15 +33,15 @@ public class FTPUtil {
         this.pwd = pwd;
     }
 
-    public static boolean upload(String type, List<File> fileList, String phone) throws IOException {
+    public static boolean upload(String type, List<File> fileList, Integer id, String identityNumber) throws IOException {
         FTPUtil ftpUtil = new FTPUtil(ftpIP, 21, ftpUser, ftpPass);
         logger.info("开始连接ftp服务器");
-        boolean result = ftpUtil.uploadFile(type, fileList, phone);
+        boolean result = ftpUtil.uploadFile(type, fileList, id, identityNumber);
         logger.info("开始连接ftp服务器，结束上传，上传结果:{}", result);
         return result;
     }
 
-    private boolean uploadFile(String type, List<File> fileList, String phone) throws IOException {
+    private boolean uploadFile(String type, List<File> fileList, Integer id, String identityNumber) throws IOException {
         boolean uploaded = false;
         FileInputStream fis = null;
         // 连接FTP服务器
@@ -50,8 +50,8 @@ public class FTPUtil {
                 ftpClient.setControlEncoding("UTF-8");
                 ftpClient.makeDirectory(type);
                 ftpClient.changeWorkingDirectory(type);
-                ftpClient.makeDirectory(phone);
-                ftpClient.changeWorkingDirectory(phone);
+                ftpClient.makeDirectory(String.valueOf(id));
+                ftpClient.changeWorkingDirectory(String.valueOf(id));
                 ftpClient.setBufferSize(1024);
                 ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
                 ftpClient.enterLocalPassiveMode();
