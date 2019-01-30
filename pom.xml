@@ -50,6 +50,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
         </dependency>
+
+        <!-- ftpclient -->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.1</version>
+        </dependency>
     </dependencies>
 
     <build>
