@@ -6,15 +6,12 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.service.AgentService;
 import com.zjut.dropshipping.service.FileService;
-import com.zjut.dropshipping.utils.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author zjxjwxk
@@ -60,14 +57,6 @@ public class AgentController {
         }
         // 填充业务
         String path = request.getSession().getServletContext().getRealPath("upload");
-        String targetFileName = fileService.IDCardUpload(file, path, type, agent.getId(),
-                agent.getIdentityNumber());
-        String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
-
-        Map fileMap = new HashMap(2);
-        fileMap.put("uri", targetFileName);
-        fileMap.put("url", url);
-
-        return ServerResponse.createBySuccess(fileMap);
+        return fileService.IDCardUpload(file, path, type, agent.getId(), agent.getIdentityNumber());
     }
 }
