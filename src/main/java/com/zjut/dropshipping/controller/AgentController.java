@@ -31,8 +31,13 @@ public class AgentController {
 
     @PostMapping("/register")
     @ResponseBody
-    public ServerResponse<String> register(Agent agent) {
-        return agentService.register(agent);
+    public ServerResponse<String> register(Agent agent, HttpSession session) {
+        ServerResponse<String> response = agentService.register(agent);
+        if (response.isSuccess()) {
+            session.setAttribute(Const.CURRENT_USER, response.getData());
+        }
+
+        return response;
     }
 
     @PostMapping("/login")
