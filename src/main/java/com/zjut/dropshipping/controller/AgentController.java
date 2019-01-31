@@ -31,10 +31,10 @@ public class AgentController {
 
     @PostMapping("/register")
     @ResponseBody
-    public ServerResponse<String> register(Agent agent, HttpSession session) {
-        ServerResponse<String> response = agentService.register(agent);
+    public ServerResponse register(Agent agent, HttpSession session) {
+        ServerResponse response = agentService.register(agent);
         if (response.isSuccess()) {
-            session.setAttribute(Const.CURRENT_USER, response.getData());
+            session.setAttribute(Const.CURRENT_USER, agent);
         }
 
         return response;
