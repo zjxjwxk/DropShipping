@@ -1,7 +1,7 @@
 package com.zjut.dropshipping.service;
 
 import com.zjut.dropshipping.common.ServerResponse;
-import com.zjut.dropshipping.vo.CategoryVO;
+import com.zjut.dropshipping.dto.CategoryDTO;
 
 import java.util.List;
 
@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface CategoryService {
 
-    ServerResponse<List<CategoryVO>> getAllCategories();
+    ServerResponse<List<CategoryDTO>> getAllCategories();
 }

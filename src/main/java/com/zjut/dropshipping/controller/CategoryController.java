@@ -2,7 +2,7 @@ package com.zjut.dropshipping.controller;
 
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.service.CategoryService;
-import com.zjut.dropshipping.vo.CategoryVO;
+import com.zjut.dropshipping.dto.CategoryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +27,7 @@ public class CategoryController {
 
     @GetMapping("/get_all_categories")
     @ResponseBody
-    public ServerResponse<List<CategoryVO>> getAllCategories() {
+    public ServerResponse<List<CategoryDTO>> getAllCategories() {
         return categoryService.getAllCategories();
     }
 }

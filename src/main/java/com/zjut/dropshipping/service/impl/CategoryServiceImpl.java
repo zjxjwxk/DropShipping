@@ -5,7 +5,7 @@ import com.zjut.dropshipping.dataobject.Category;
 import com.zjut.dropshipping.repository.CategoryRepository;
 import com.zjut.dropshipping.service.CategoryService;
 import com.zjut.dropshipping.utils.PropertiesUtil;
-import com.zjut.dropshipping.vo.CategoryVO;
+import com.zjut.dropshipping.dto.CategoryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,34 +26,34 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ServerResponse<List<CategoryVO>> getAllCategories() {
+    public ServerResponse<List<CategoryDTO>> getAllCategories() {
         return ServerResponse.createBySuccess(getAllCategoriesByParentId(0));
     }
 
-    private List<CategoryVO> getAllCategoriesByParentId(Integer parentId) {
+    private List<CategoryDTO> getAllCategoriesByParentId(Integer parentId) {
         List<Category> categoryList = categoryRepository.findByParentId(parentId);
         if (categoryList.size() == 0) {
             return null;
         }
-        List<CategoryVO> categoryVOList = new ArrayList<>();
+        List<CategoryDTO> categoryDTOList = new ArrayList<>();
         for (Category category :
                 categoryList) {
-            CategoryVO categoryVO = new CategoryVO();
-            categoryVO.setId(category.getId());
-            categoryVO.setName(category.getName());
-            categoryVO.setRank(category.getRank());
-            List<CategoryVO> childList = getAllCategoriesByParentId(category.getId());
+            CategoryDTO categoryDTO = new CategoryDTO();
+            categoryDTO.setId(category.getId());
+            categoryDTO.setName(category.getName());
+            categoryDTO.setRank(category.getRank());
+            List<CategoryDTO> childList = getAllCategoriesByParentId(category.getId());
             if (childList == null) {
-                categoryVO.setChildSize(0);
-                categoryVO.setChildList(null);
-                categoryVO.setImagePath(PropertiesUtil.getProperty("ftp.server.http.prefix") + "category/" + category.getId() + ".jpg");
+                categoryDTO.setChildSize(0);
+                categoryDTO.setChildList(null);
+                categoryDTO.setImagePath(PropertiesUtil.getProperty("ftp.server.http.prefix") + "category/" + category.getId() + ".jpg");
             } else {
-                categoryVO.setChildSize(childList.size());
-                categoryVO.setChildList(childList);
+                categoryDTO.setChildSize(childList.size());
+                categoryDTO.setChildList(childList);
             }
 
-            categoryVOList.add(categoryVO);
+            categoryDTOList.add(categoryDTO);
         }
-        return categoryVOList;
+        return categoryDTOList;
     }
 }

@@ -1,4 +1,4 @@
-package com.zjut.dropshipping.vo;
+package com.zjut.dropshipping.dto;
 
 import lombok.Data;
 
@@ -8,13 +8,13 @@ import java.util.List;
  * @author zjxjwxk
  */
 @Data
-public class CategoryVO {
+public class CategoryDTO {
 
     private Integer id;
     private String name;
     private Integer rank;
     private Integer childSize;
-    private List<CategoryVO> childList;
+    private List<CategoryDTO> childList;
     private String imagePath;
 
 }
