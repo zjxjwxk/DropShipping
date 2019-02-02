@@ -44,8 +44,8 @@ public class AgentServiceImpl implements AgentService {
             return validResponse;
         }
 
-        // 设置状态为未批准
-        agent.setState(Const.State.UNAPPROVED);
+        // 设置状态为未审核
+        agent.setState(Const.Status.UNREVIEWED);
 
         // MD5加密
         agent.setPassword(MD5Util.MD5EncodeUtf8(agent.getPassword()));

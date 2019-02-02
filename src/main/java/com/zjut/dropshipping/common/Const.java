@@ -12,11 +12,11 @@ public class Const {
     public static final String IDENTITY_NUMBER = "identityNumber";
     public static final String EXTERNAL_SHOP = "externalShop";
 
-    public interface State {
+    public interface Status {
 
         String NORMAL = "正常";
 
-        String UNAPPROVED = "未批准";
+        String UNREVIEWED = "未审核";
 
         String FROZEN = "冻结";
     }
