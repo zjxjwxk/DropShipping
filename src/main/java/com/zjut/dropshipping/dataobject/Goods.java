@@ -18,7 +18,7 @@ public class Goods {
     private Integer producerId;
     private Integer categoryId;
     private String name;
-    private Integer price;
+    private Double price;
     private Integer stock;
     private String status;
     private Date createTime;

@@ -10,6 +10,6 @@ public class GoodsDTO {
 
     private Integer goodsId;
     private String name;
-    private Integer price;
+    private Double price;
 
 }
