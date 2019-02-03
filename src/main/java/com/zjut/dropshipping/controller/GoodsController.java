@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
  * @author zjxjwxk
  */
 @RestController
-@RequestMapping("/goods/")
+@RequestMapping("/goods")
 public class GoodsController {
 
     private final GoodsService goodsService;
@@ -27,5 +27,29 @@ public class GoodsController {
                                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
                                                @RequestParam(value = "orderBy", defaultValue = "") String orderBy) {
         return goodsService.getList(keyword, categoryId, pageNum, pageSize, orderBy);
+    }
+
+    @GetMapping("/get_detail")
+    @ResponseBody
+    public ServerResponse getDetail(Integer goodsId) {
+        return goodsService.getDetail(goodsId);
+    }
+
+    @GetMapping("/get_evaluation")
+    @ResponseBody
+    public ServerResponse getEvaluation(Integer goodsId) {
+        return goodsService.getEvaluation(goodsId);
+    }
+
+    @GetMapping("/get_producer")
+    @ResponseBody
+    public ServerResponse getProducer(Integer goodsId) {
+        return goodsService.getProducer(goodsId);
+    }
+
+    @GetMapping("/get_average_level")
+    @ResponseBody
+    public ServerResponse getAverageLevel(Integer goodsId) {
+        return goodsService.getAverageLevel(goodsId);
     }
 }
