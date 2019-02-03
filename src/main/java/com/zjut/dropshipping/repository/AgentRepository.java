@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface AgentRepository extends JpaRepository<Agent, Integer> {
 
+    Agent findOneById(Integer id);
+
     Integer countByPhone(String phone);
 
     Integer countByIdentityNumber(String identityNumber);

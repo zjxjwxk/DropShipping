@@ -68,7 +68,7 @@ public class AgentServiceImpl implements AgentService {
             return ServerResponse.createByErrorMessage("用户名或密码错误");
         }
 
-        agent.setPassword(StringUtils.EMPTY);
+        agent.setPassword(null);
         return ServerResponse.createBySuccess("登陆成功", agent);
     }
 
