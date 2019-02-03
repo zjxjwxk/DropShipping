@@ -13,16 +13,19 @@ import java.util.Date;
 @Entity
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Goods {
+public class Producer {
 
     @Id
-    private Integer goodsId;
-    private Integer producerId;
-    private Integer categoryId;
+    private Integer id;
     private String name;
-    private Double price;
-    private Integer stock;
+    private String contactName;
+    private String contactPhone;
+    private String contactIdentityNumber;
+    private String region;
+    private String licenseNumber;
     private String status;
-    private Date createTime;
-    private Date updateTime;
+    private Date joinTime;
+    private Integer registerCapital;
+    private Date registerTime;
+    private String credibility;
 }
