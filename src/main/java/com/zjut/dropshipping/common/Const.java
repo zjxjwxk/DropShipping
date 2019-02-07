@@ -12,7 +12,7 @@ public class Const {
     public static final String IDENTITY_NUMBER = "identityNumber";
     public static final String EXTERNAL_SHOP = "externalShop";
 
-    public interface Status {
+    public interface AgentState {
 
         String NORMAL = "正常";
 
@@ -20,6 +20,16 @@ public class Const {
 
         String FROZEN = "冻结";
     }
+
+    public interface AgreementState {
+
+        String NORMAL = "正常";
+
+        String AGENT_REQUEST = "代理发送请求";
+
+        String PRODUCER_REQUEST = "厂商发送请求";
+    }
+
 
     public interface UploadType {
 
