@@ -23,7 +23,7 @@ public class Producer {
     private String contactIdentityNumber;
     private String region;
     private String licenseNumber;
-    private String status;
+    private String state;
     private Date joinTime;
     private Integer registerCapital;
     private Date registerTime;
