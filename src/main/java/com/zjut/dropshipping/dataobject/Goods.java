@@ -22,7 +22,7 @@ public class Goods {
     private String name;
     private Double price;
     private Integer stock;
-    private String status;
+    private String state;
     private Date createTime;
     private Date updateTime;
 }
