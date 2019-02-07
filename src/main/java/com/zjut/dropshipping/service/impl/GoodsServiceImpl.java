@@ -94,7 +94,7 @@ public class GoodsServiceImpl implements GoodsService {
         }
         producer.setContactIdentityNumber(null);
         producer.setLicenseNumber(null);
-        producer.setStatus(null);
+        producer.setState(null);
         producer.setJoinTime(null);
         producer.setCredibility(null);
 
@@ -134,7 +134,7 @@ public class GoodsServiceImpl implements GoodsService {
             goods.setProducerId(null);
             goods.setCategoryId(null);
             goods.setStock(null);
-            goods.setStatus(null);
+            goods.setState(null);
             goods.setCreateTime(null);
             goods.setUpdateTime(null);
         }

@@ -3,7 +3,9 @@ package com.zjut.dropshipping.service.impl;
 import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
+import com.zjut.dropshipping.dataobject.Agreement;
 import com.zjut.dropshipping.repository.AgentRepository;
+import com.zjut.dropshipping.repository.AgreementRepository;
 import com.zjut.dropshipping.service.AgentService;
 import com.zjut.dropshipping.utils.MD5Util;
 import org.apache.commons.lang3.StringUtils;
@@ -17,10 +19,12 @@ import org.springframework.stereotype.Service;
 public class AgentServiceImpl implements AgentService {
 
     private final AgentRepository agentRepository;
+    private final AgreementRepository agreementRepository;
 
     @Autowired
-    public AgentServiceImpl(AgentRepository agentRepository) {
+    public AgentServiceImpl(AgentRepository agentRepository, AgreementRepository agreementRepository) {
         this.agentRepository = agentRepository;
+        this.agreementRepository = agreementRepository;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class AgentServiceImpl implements AgentService {
         }
 
         // 设置状态为未审核
-        agent.setState(Const.Status.UNREVIEWED);
+        agent.setState(Const.AgentState.UNREVIEWED);
 
         // MD5加密
         agent.setPassword(MD5Util.MD5EncodeUtf8(agent.getPassword()));
@@ -70,6 +74,25 @@ public class AgentServiceImpl implements AgentService {
 
         agent.setPassword(null);
         return ServerResponse.createBySuccess("登陆成功", agent);
+    }
+
+    @Override
+    public ServerResponse<String> requestAgreement(Integer producerId, Integer agentId) {
+        Agreement agreement = agreementRepository.findByProducerIdAndAgentId(producerId, agentId);
+        if (agreement == null) {
+            Agreement agreement1 = new Agreement();
+            agreement1.setProducerId(producerId);
+            agreement1.setAgentId(agentId);
+            agreement1.setState("代理发送请求");
+            agreementRepository.save(agreement1);
+            return ServerResponse.createBySuccess("请求发送成功");
+        } else if (agreement.getState().equals(Const.AgreementState.NORMAL)) {
+            return ServerResponse.createByErrorMessage("已达成协议");
+        } else if (agreement.getState().equals(Const.AgreementState.AGENT_REQUEST)) {
+            return ServerResponse.createByErrorMessage("请求已发送");
+        } else {
+            return ServerResponse.createBySuccess("达成协议");
+        }
     }
 
     private ServerResponse<String> checkValid(String str, String type) {

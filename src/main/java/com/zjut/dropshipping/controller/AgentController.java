@@ -60,8 +60,23 @@ public class AgentController {
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        // 填充业务
         String path = request.getSession().getServletContext().getRealPath("upload");
         return fileService.IDCardUpload(file, path, type, agent.getId(), agent.getIdentityNumber());
+    }
+
+    @PostMapping("/request_agreement")
+    @ResponseBody
+    public ServerResponse requestAgreement(HttpSession session, Integer producerId) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        if (agent.getState().equals(Const.AgentState.UNREVIEWED)) {
+            return ServerResponse.createByErrorMessage("还未进行实名认证或审核还未通过");
+        } else if (agent.getState().equals(Const.AgentState.FROZEN)) {
+            return ServerResponse.createByErrorMessage("账号已冻结");
+        } else {
+            return agentService.requestAgreement(producerId, agent.getId());
+        }
     }
 }
