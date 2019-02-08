@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class GoodsServiceImpl implements GoodsService {
                                                String orderBy) {
         PageRequest pageRequest = PageRequest.of(pageNum - 1, pageSize);
         Page<Goods> goodsPage = goodsRepository.findByCategoryId(categoryId, pageRequest);
-        return ServerResponse.createBySuccess(getPageChunk(goodsPage));
+        return ServerResponse.createBySuccess(this.getPageChunk(goodsPage));
     }
 
     @Override
@@ -78,7 +77,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (goodsEvaluationList.size() == 0) {
             return ServerResponse.createByErrorMessage("该商品暂无评论");
         }
-        return ServerResponse.createBySuccess(getEvaluationList(goodsEvaluationList));
+        return ServerResponse.createBySuccess(this.getEvaluationList(goodsEvaluationList));
     }
 
     @Override
@@ -88,11 +87,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (producer == null) {
             return ServerResponse.createByErrorMessage("找不到该商品的厂商信息");
         }
-        producer.setContactIdentityNumber(null);
-        producer.setLicenseNumber(null);
-        producer.setState(null);
-        producer.setJoinTime(null);
-        producer.setCredibility(null);
+        producer.setNull();
 
         return ServerResponse.createBySuccess(producer);
     }
@@ -116,7 +111,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     private PageChunk<Goods> getPageChunk(Page<Goods> goodsPage) {
         PageChunk<Goods> pageChunk = new PageChunk<>();
-        pageChunk.setContent(getGoodsList(goodsPage.getContent()));
+        pageChunk.setContent(this.getGoodsList(goodsPage.getContent()));
         pageChunk.setTotalPages(goodsPage.getTotalPages());
         pageChunk.setTotalElements(goodsPage.getTotalElements());
         pageChunk.setPageNumber(goodsPage.getPageable().getPageNumber() + 1);

@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ServerResponse<List<CategoryDTO>> getAllCategories() {
-        return ServerResponse.createBySuccess(getAllCategoriesByParentId(0));
+        return ServerResponse.createBySuccess(this.getAllCategoriesByParentId(0));
     }
 
     private List<CategoryDTO> getAllCategoriesByParentId(Integer parentId) {
