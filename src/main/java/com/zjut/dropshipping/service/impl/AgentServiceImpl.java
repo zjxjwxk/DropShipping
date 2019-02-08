@@ -5,6 +5,7 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
 import com.zjut.dropshipping.dataobject.Producer;
+import com.zjut.dropshipping.dto.ProducerAgreementRequestDTO;
 import com.zjut.dropshipping.repository.AgentRepository;
 import com.zjut.dropshipping.repository.AgreementRepository;
 import com.zjut.dropshipping.repository.ProducerRepository;
@@ -113,15 +114,25 @@ public class AgentServiceImpl implements AgentService {
         return ServerResponse.createBySuccess(this.getProducerAgreementRequestList(agreementList));
     }
 
-    private List<Producer> getProducerAgreementRequestList(List<Agreement> agreementList) {
-        List<Producer> producerList = new ArrayList<>();
+    private List<ProducerAgreementRequestDTO> getProducerAgreementRequestList(List<Agreement> agreementList) {
+        List<ProducerAgreementRequestDTO> producerAgreementRequestDTOList = new ArrayList<>();
         for (Agreement agreement :
                 agreementList) {
             Producer producer = producerRepository.findOneById(agreement.getProducerId());
-            producer.setNull();
-            producerList.add(producer);
+            ProducerAgreementRequestDTO producerAgreementRequestDTO = new ProducerAgreementRequestDTO();
+            producerAgreementRequestDTO.setId(producer.getId());
+            producerAgreementRequestDTO.setName(producer.getName());
+            producerAgreementRequestDTO.setContactName(producer.getName());
+            producerAgreementRequestDTO.setContactPhone(producer.getContactPhone());
+            producerAgreementRequestDTO.setRegion(producer.getRegion());
+            producerAgreementRequestDTO.setRegisterCapital(producer.getRegisterCapital());
+            producerAgreementRequestDTO.setRegisterTime(producer.getRegisterTime());
+            producerAgreementRequestDTO.setContent(producer.getContent());
+            producerAgreementRequestDTO.setRequestTime(agreement.getTime());
+
+            producerAgreementRequestDTOList.add(producerAgreementRequestDTO);
         }
-        return producerList;
+        return producerAgreementRequestDTOList;
     }
 
     private ServerResponse<String> checkValid(String str, String type) {
