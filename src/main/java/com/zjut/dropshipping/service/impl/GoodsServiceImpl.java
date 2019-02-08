@@ -6,17 +6,13 @@ import com.zjut.dropshipping.dataobject.Goods;
 import com.zjut.dropshipping.dataobject.GoodsEvaluation;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.dto.*;
-import com.zjut.dropshipping.repository.AgentRepository;
-import com.zjut.dropshipping.repository.GoodsEvaluationRepository;
-import com.zjut.dropshipping.repository.GoodsRepository;
-import com.zjut.dropshipping.repository.ProducerRepository;
+import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,16 +26,19 @@ public class GoodsServiceImpl implements GoodsService {
     private final GoodsEvaluationRepository goodsEvaluationRepository;
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
+    private final OrderRepository orderRepository;
 
     @Autowired
     public GoodsServiceImpl(GoodsRepository goodsRepository,
                             GoodsEvaluationRepository goodsEvaluationRepository,
                             AgentRepository agentRepository,
-                            ProducerRepository producerRepository) {
+                            ProducerRepository producerRepository,
+                            OrderRepository orderRepository) {
         this.goodsRepository = goodsRepository;
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
         this.producerRepository = producerRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -48,7 +47,7 @@ public class GoodsServiceImpl implements GoodsService {
                                                String orderBy) {
         PageRequest pageRequest = PageRequest.of(pageNum - 1, pageSize);
         Page<Goods> goodsPage = goodsRepository.findByCategoryId(categoryId, pageRequest);
-        return ServerResponse.createBySuccess(getPageChunk(goodsPage));
+        return ServerResponse.createBySuccess(this.getPageChunk(goodsPage));
     }
 
     @Override
@@ -67,13 +66,9 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public ServerResponse<Double> getAverageLevel(Integer goodsId) {
-        Double averageLevel = goodsEvaluationRepository.findAverageLevelByGoodsId(goodsId);
-        if (averageLevel == null) {
-            return ServerResponse.createBySuccess(0.00);
-        }
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        return ServerResponse.createBySuccess(Double.parseDouble(decimalFormat.format(averageLevel)));
+    public ServerResponse<Integer> getSalesVolume(Integer goodsId) {
+        Integer salesVolume = orderRepository.findSalesVolumeByGoodsId(goodsId);
+        return ServerResponse.createBySuccess(salesVolume);
     }
 
     @Override
@@ -82,7 +77,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (goodsEvaluationList.size() == 0) {
             return ServerResponse.createByErrorMessage("该商品暂无评论");
         }
-        return ServerResponse.createBySuccess(getEvaluationList(goodsEvaluationList));
+        return ServerResponse.createBySuccess(this.getEvaluationList(goodsEvaluationList));
     }
 
     @Override
@@ -92,11 +87,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (producer == null) {
             return ServerResponse.createByErrorMessage("找不到该商品的厂商信息");
         }
-        producer.setContactIdentityNumber(null);
-        producer.setLicenseNumber(null);
-        producer.setState(null);
-        producer.setJoinTime(null);
-        producer.setCredibility(null);
+        producer.setNull();
 
         return ServerResponse.createBySuccess(producer);
     }
@@ -120,7 +111,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     private PageChunk<Goods> getPageChunk(Page<Goods> goodsPage) {
         PageChunk<Goods> pageChunk = new PageChunk<>();
-        pageChunk.setContent(getGoodsList(goodsPage.getContent()));
+        pageChunk.setContent(this.getGoodsList(goodsPage.getContent()));
         pageChunk.setTotalPages(goodsPage.getTotalPages());
         pageChunk.setTotalElements(goodsPage.getTotalElements());
         pageChunk.setPageNumber(goodsPage.getPageable().getPageNumber() + 1);

@@ -79,4 +79,14 @@ public class AgentController {
             return agentService.requestAgreement(producerId, agent.getId());
         }
     }
+
+    @GetMapping("/get_producer_agreement_request")
+    @ResponseBody
+    public ServerResponse getProducerAgreementRequest(HttpSession session) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return agentService.getProducerAgreementRequest(agent.getId());
+    }
 }

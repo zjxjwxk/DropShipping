@@ -13,4 +13,6 @@ public interface AgentService {
     ServerResponse<Agent> login(String phone, String password);
 
     ServerResponse<String> requestAgreement(Integer producerId, Integer agentId);
+
+    ServerResponse getProducerAgreementRequest(Integer agentId);
 }

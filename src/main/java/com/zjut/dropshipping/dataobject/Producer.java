@@ -28,4 +28,13 @@ public class Producer {
     private Integer registerCapital;
     private Date registerTime;
     private String credibility;
+    private String content;
+
+    public void setNull() {
+        this.setContactIdentityNumber(null);
+        this.setLicenseNumber(null);
+        this.setState(null);
+        this.setJoinTime(null);
+        this.setCredibility(null);
+    }
 }

@@ -1,10 +1,11 @@
 package com.zjut.dropshipping.dataobject;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
 /**
@@ -12,18 +13,18 @@ import java.util.Date;
  */
 @Entity
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class Goods {
+@Table(name = "`order`")
+public class Order {
 
     @Id
-    private Integer goodsId;
+    private Integer orderId;
+    private Integer agentId;
     private Integer producerId;
-    private Integer categoryId;
-    private String name;
-    private Double price;
-    private Integer stock;
+    private Integer goodsId;
+    private Integer number;
     private String state;
+    private String remark;
+    @CreatedDate
     private Date createTime;
     private Date updateTime;
-    private String content;
 }

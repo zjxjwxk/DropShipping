@@ -10,7 +10,7 @@ public interface GoodsService {
 
     ServerResponse getDetail(Integer goodsId);
 
-    ServerResponse getAverageLevel(Integer goodsId);
+    ServerResponse getSalesVolume(Integer goodsId);
 
     ServerResponse getEvaluation(Integer goodsId);
 

@@ -47,9 +47,9 @@ public class GoodsController {
         return goodsService.getProducer(goodsId);
     }
 
-    @GetMapping("/get_average_level")
+    @GetMapping("/get_sales_volume")
     @ResponseBody
-    public ServerResponse getAverageLevel(Integer goodsId) {
-        return goodsService.getAverageLevel(goodsId);
+    public ServerResponse getSalesVolume(Integer goodsId) {
+        return goodsService.getSalesVolume(goodsId);
     }
 }
