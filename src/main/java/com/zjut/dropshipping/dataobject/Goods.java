@@ -25,4 +25,5 @@ public class Goods {
     private String state;
     private Date createTime;
     private Date updateTime;
+    private String content;
 }
