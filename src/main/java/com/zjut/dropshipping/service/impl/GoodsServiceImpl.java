@@ -6,10 +6,7 @@ import com.zjut.dropshipping.dataobject.Goods;
 import com.zjut.dropshipping.dataobject.GoodsEvaluation;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.dto.*;
-import com.zjut.dropshipping.repository.AgentRepository;
-import com.zjut.dropshipping.repository.GoodsEvaluationRepository;
-import com.zjut.dropshipping.repository.GoodsRepository;
-import com.zjut.dropshipping.repository.ProducerRepository;
+import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,16 +27,19 @@ public class GoodsServiceImpl implements GoodsService {
     private final GoodsEvaluationRepository goodsEvaluationRepository;
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
+    private final OrderRepository orderRepository;
 
     @Autowired
     public GoodsServiceImpl(GoodsRepository goodsRepository,
                             GoodsEvaluationRepository goodsEvaluationRepository,
                             AgentRepository agentRepository,
-                            ProducerRepository producerRepository) {
+                            ProducerRepository producerRepository,
+                            OrderRepository orderRepository) {
         this.goodsRepository = goodsRepository;
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
         this.producerRepository = producerRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -67,13 +67,9 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public ServerResponse<Double> getAverageLevel(Integer goodsId) {
-        Double averageLevel = goodsEvaluationRepository.findAverageLevelByGoodsId(goodsId);
-        if (averageLevel == null) {
-            return ServerResponse.createBySuccess(0.00);
-        }
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        return ServerResponse.createBySuccess(Double.parseDouble(decimalFormat.format(averageLevel)));
+    public ServerResponse<Integer> getSalesVolume(Integer goodsId) {
+        Integer salesVolume = orderRepository.findSalesVolumeByGoodsId(goodsId);
+        return ServerResponse.createBySuccess(salesVolume);
     }
 
     @Override
