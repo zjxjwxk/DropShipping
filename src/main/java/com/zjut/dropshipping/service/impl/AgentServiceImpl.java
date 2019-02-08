@@ -4,13 +4,18 @@ import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
+import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.repository.AgentRepository;
 import com.zjut.dropshipping.repository.AgreementRepository;
+import com.zjut.dropshipping.repository.ProducerRepository;
 import com.zjut.dropshipping.service.AgentService;
 import com.zjut.dropshipping.utils.MD5Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author zjxjwxk
@@ -19,11 +24,15 @@ import org.springframework.stereotype.Service;
 public class AgentServiceImpl implements AgentService {
 
     private final AgentRepository agentRepository;
+    private final ProducerRepository producerRepository;
     private final AgreementRepository agreementRepository;
 
     @Autowired
-    public AgentServiceImpl(AgentRepository agentRepository, AgreementRepository agreementRepository) {
+    public AgentServiceImpl(AgentRepository agentRepository,
+                            ProducerRepository producerRepository,
+                            AgreementRepository agreementRepository) {
         this.agentRepository = agentRepository;
+        this.producerRepository = producerRepository;
         this.agreementRepository = agreementRepository;
     }
 
@@ -93,6 +102,26 @@ public class AgentServiceImpl implements AgentService {
         } else {
             return ServerResponse.createBySuccess("达成协议");
         }
+    }
+
+    @Override
+    public ServerResponse getProducerAgreementRequest(Integer agentId) {
+        List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.PRODUCER_REQUEST);
+        if (agreementList.size() == 0) {
+            return ServerResponse.createByErrorMessage("还没有厂商请求协议");
+        }
+        return ServerResponse.createBySuccess(this.getProducerAgreementRequestList(agreementList));
+    }
+
+    private List<Producer> getProducerAgreementRequestList(List<Agreement> agreementList) {
+        List<Producer> producerList = new ArrayList<>();
+        for (Agreement agreement :
+                agreementList) {
+            Producer producer = producerRepository.findOneById(agreement.getProducerId());
+            producer.setNull();
+            producerList.add(producer);
+        }
+        return producerList;
     }
 
     private ServerResponse<String> checkValid(String str, String type) {
