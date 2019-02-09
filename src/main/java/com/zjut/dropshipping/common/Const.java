@@ -12,7 +12,10 @@ public class Const {
     public static final String IDENTITY_NUMBER = "identityNumber";
     public static final String EXTERNAL_SHOP = "externalShop";
 
-    public interface AgentState {
+    public static final String PRODUCER_NAME = "producerName";
+    public static final String LICENSE_NUMBER = "licenseNumber";
+
+    public interface AccountState {
 
         String NORMAL = "正常";
 
