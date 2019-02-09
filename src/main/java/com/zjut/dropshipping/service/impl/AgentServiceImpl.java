@@ -1,6 +1,7 @@
 package com.zjut.dropshipping.service.impl;
 
 import com.zjut.dropshipping.common.Const;
+import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
@@ -89,10 +90,10 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public ServerResponse<String> requestAgreement(Integer producerId, Integer agentId) {
         Agreement agreement = agreementRepository.findByProducerIdAndAgentId(producerId, agentId);
+        Agreement agreement1 = new Agreement();
+        agreement1.setProducerId(producerId);
+        agreement1.setAgentId(agentId);
         if (agreement == null) {
-            Agreement agreement1 = new Agreement();
-            agreement1.setProducerId(producerId);
-            agreement1.setAgentId(agentId);
             agreement1.setState("代理发送请求");
             agreementRepository.save(agreement1);
             return ServerResponse.createBySuccess("请求发送成功");
@@ -101,6 +102,8 @@ public class AgentServiceImpl implements AgentService {
         } else if (agreement.getState().equals(Const.AgreementState.AGENT_REQUEST)) {
             return ServerResponse.createByErrorMessage("请求已发送");
         } else {
+            agreement1.setState(Const.AgreementState.NORMAL);
+            agreementRepository.save(agreement1);
             return ServerResponse.createBySuccess("达成协议");
         }
     }
@@ -112,6 +115,23 @@ public class AgentServiceImpl implements AgentService {
             return ServerResponse.createByErrorMessage("还没有厂商请求协议");
         }
         return ServerResponse.createBySuccess(this.getProducerAgreementRequestList(agreementList));
+    }
+
+    @Override
+    public ServerResponse responseProducerAgreementRequest(Integer agentId, Integer producerId, String response) {
+        Agreement agreement = new Agreement();
+        agreement.setAgentId(agentId);
+        agreement.setProducerId(producerId);
+        if (Const.AgreementResponse.ACCEPT.equals(response)) {
+            agreement.setState(Const.AgreementState.NORMAL);
+            agreementRepository.save(agreement);
+            return ServerResponse.createBySuccess("达成协议");
+        } else if (Const.AgreementResponse.REFUSE.equals(response)) {
+            agreementRepository.delete(agreement);
+            return ServerResponse.createBySuccess("已拒绝请求");
+        } else {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
     }
 
     private List<ProducerAgreementRequestDTO> getProducerAgreementRequestList(List<Agreement> agreementList) {
