@@ -122,7 +122,7 @@ public class AgentServiceImpl implements AgentService {
             ProducerAgreementRequestDTO producerAgreementRequestDTO = new ProducerAgreementRequestDTO();
             producerAgreementRequestDTO.setId(producer.getId());
             producerAgreementRequestDTO.setName(producer.getName());
-            producerAgreementRequestDTO.setContactName(producer.getName());
+            producerAgreementRequestDTO.setContactName(producer.getContactName());
             producerAgreementRequestDTO.setContactPhone(producer.getContactPhone());
             producerAgreementRequestDTO.setRegion(producer.getRegion());
             producerAgreementRequestDTO.setRegisterCapital(producer.getRegisterCapital());
