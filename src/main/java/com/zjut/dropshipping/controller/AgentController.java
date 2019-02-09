@@ -71,9 +71,9 @@ public class AgentController {
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        if (agent.getState().equals(Const.AgentState.UNREVIEWED)) {
+        if (agent.getState().equals(Const.AccountState.UNREVIEWED)) {
             return ServerResponse.createByErrorMessage("还未进行实名认证或审核还未通过");
-        } else if (agent.getState().equals(Const.AgentState.FROZEN)) {
+        } else if (agent.getState().equals(Const.AccountState.FROZEN)) {
             return ServerResponse.createByErrorMessage("账号已冻结");
         } else {
             return agentService.requestAgreement(producerId, agent.getId());

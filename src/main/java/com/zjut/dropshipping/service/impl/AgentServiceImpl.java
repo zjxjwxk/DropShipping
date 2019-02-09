@@ -60,7 +60,7 @@ public class AgentServiceImpl implements AgentService {
         }
 
         // 设置状态为未审核
-        agent.setState(Const.AgentState.UNREVIEWED);
+        agent.setState(Const.AccountState.UNREVIEWED);
 
         // MD5加密
         agent.setPassword(MD5Util.MD5EncodeUtf8(agent.getPassword()));
