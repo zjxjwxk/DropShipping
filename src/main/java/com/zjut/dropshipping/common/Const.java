@@ -30,6 +30,12 @@ public class Const {
         String PRODUCER_REQUEST = "厂商发送请求";
     }
 
+    public interface AgreementResponse {
+
+        String ACCEPT = "accept";
+
+        String REFUSE = "refuse";
+    }
 
     public interface UploadType {
 
