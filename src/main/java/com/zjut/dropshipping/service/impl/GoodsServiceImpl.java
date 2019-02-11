@@ -1,10 +1,8 @@
 package com.zjut.dropshipping.service.impl;
 
+import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ServerResponse;
-import com.zjut.dropshipping.dataobject.Agent;
-import com.zjut.dropshipping.dataobject.Goods;
-import com.zjut.dropshipping.dataobject.GoodsEvaluation;
-import com.zjut.dropshipping.dataobject.Producer;
+import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.GoodsService;
@@ -27,26 +25,35 @@ public class GoodsServiceImpl implements GoodsService {
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
     private final OrderRepository orderRepository;
+    private final AgreementRepository agreementRepository;
 
     @Autowired
     public GoodsServiceImpl(GoodsRepository goodsRepository,
                             GoodsEvaluationRepository goodsEvaluationRepository,
                             AgentRepository agentRepository,
                             ProducerRepository producerRepository,
-                            OrderRepository orderRepository) {
+                            OrderRepository orderRepository,
+                            AgreementRepository agreementRepository) {
         this.goodsRepository = goodsRepository;
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
         this.producerRepository = producerRepository;
         this.orderRepository = orderRepository;
+        this.agreementRepository = agreementRepository;
     }
 
     @Override
-    public ServerResponse getList(String keyword, Integer categoryId,
-                                               Integer pageNum, Integer pageSize,
-                                               String orderBy) {
+    public ServerResponse getList(String keyword, Integer categoryId, Integer agreementAgentId, Integer pageNum, Integer pageSize,
+                                  String orderBy) {
         PageRequest pageRequest = PageRequest.of(pageNum - 1, pageSize);
-        Page<Goods> goodsPage = goodsRepository.findByCategoryId(categoryId, pageRequest);
+        Page<Goods> goodsPage;
+        if (agreementAgentId != null) {
+            List<Integer> producerIdList = agreementRepository.findProducerIdListByAgentIdAndState(agreementAgentId, Const.AgreementState.NORMAL);
+            goodsPage = goodsRepository.findByProducerIdInAndCategoryId(producerIdList, categoryId, pageRequest);
+        } else {
+            goodsPage = goodsRepository.findByCategoryId(categoryId, pageRequest);
+        }
+
         return ServerResponse.createBySuccess(this.getPageChunk(goodsPage));
     }
 
