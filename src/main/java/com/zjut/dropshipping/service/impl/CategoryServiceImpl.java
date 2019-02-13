@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author zjxjwxk
@@ -28,6 +30,37 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ServerResponse<List<CategoryDTO>> getAllCategories() {
         return ServerResponse.createBySuccess(this.getAllCategoriesByParentId(0));
+    }
+
+    @Override
+    public List<Integer> getCategoryAndChildrenIdListByParentId(Integer categoryId) {
+        Set<Category> categorySet = new HashSet<>();
+        this.findChildCategory(categorySet, categoryId);
+
+        List<Integer> categoryIdList = new ArrayList<>();
+        if (categoryId != null) {
+            for (Category categoryItem :
+                    categorySet) {
+                categoryIdList.add(categoryItem.getId());
+            }
+        }
+        return categoryIdList;
+    }
+
+    /**
+     * 递归算法，获得子分类节点
+     */
+    private void findChildCategory(Set<Category> categorySet, Integer categoryId) {
+        Category category = categoryRepository.findOneById(categoryId);
+        if (category != null) {
+            categorySet.add(category);
+        }
+        // 查找子节点，如果子节点为空退出递归
+        List<Category> categoryList = categoryRepository.findByParentId(categoryId);
+        for (Category categoryItem :
+                categoryList) {
+            findChildCategory(categorySet, categoryItem.getId());
+        }
     }
 
     private List<CategoryDTO> getAllCategoriesByParentId(Integer parentId) {
