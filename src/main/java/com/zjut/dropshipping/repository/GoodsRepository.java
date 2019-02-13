@@ -16,5 +16,9 @@ public interface GoodsRepository extends JpaRepository<Goods, Integer> {
 
     Goods findByGoodsId(Integer goodsId);
 
-    Page<Goods> findByProducerIdInAndCategoryId(List<Integer> producerId, Integer categoryId, Pageable pageable);
+    Page<Goods> findByCategoryIdIn(List<Integer> categoryIdList, Pageable pageable);
+
+    Page<Goods> findByProducerIdInAndCategoryIdIn(List<Integer> producerId, List<Integer> categoryIdList, Pageable pageable);
+
+
 }
