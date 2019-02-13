@@ -10,5 +10,7 @@ import java.util.List;
  */
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
+    Category findOneById(Integer categoryId);
+
     List<Category> findByParentId(Integer parentId);
 }
