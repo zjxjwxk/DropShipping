@@ -11,4 +11,6 @@ import java.util.List;
 public interface CategoryService {
 
     ServerResponse<List<CategoryDTO>> getAllCategories();
+
+    List<Integer> getCategoryAndChildrenIdListByParentId(Integer categoryId);
 }
