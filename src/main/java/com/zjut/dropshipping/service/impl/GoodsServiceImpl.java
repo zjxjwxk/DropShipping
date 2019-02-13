@@ -5,6 +5,7 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.*;
+import com.zjut.dropshipping.service.CategoryService;
 import com.zjut.dropshipping.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,31 +28,36 @@ public class GoodsServiceImpl implements GoodsService {
     private final OrderRepository orderRepository;
     private final AgreementRepository agreementRepository;
 
+    private final CategoryService categoryService;
+
     @Autowired
     public GoodsServiceImpl(GoodsRepository goodsRepository,
                             GoodsEvaluationRepository goodsEvaluationRepository,
                             AgentRepository agentRepository,
                             ProducerRepository producerRepository,
                             OrderRepository orderRepository,
-                            AgreementRepository agreementRepository) {
+                            AgreementRepository agreementRepository,
+                            CategoryService categoryService) {
         this.goodsRepository = goodsRepository;
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
         this.producerRepository = producerRepository;
         this.orderRepository = orderRepository;
         this.agreementRepository = agreementRepository;
+        this.categoryService = categoryService;
     }
 
     @Override
     public ServerResponse getList(String keyword, Integer categoryId, Integer agreementAgentId, Integer pageNum, Integer pageSize,
                                   String orderBy) {
+        List<Integer> categoryIdList = categoryService.getCategoryAndChildrenIdListByParentId(categoryId);
         PageRequest pageRequest = PageRequest.of(pageNum - 1, pageSize);
         Page<Goods> goodsPage;
         if (agreementAgentId != null) {
             List<Integer> producerIdList = agreementRepository.findProducerIdListByAgentIdAndState(agreementAgentId, Const.AgreementState.NORMAL);
-            goodsPage = goodsRepository.findByProducerIdInAndCategoryId(producerIdList, categoryId, pageRequest);
+            goodsPage = goodsRepository.findByProducerIdInAndCategoryIdIn(producerIdList, categoryIdList, pageRequest);
         } else {
-            goodsPage = goodsRepository.findByCategoryId(categoryId, pageRequest);
+            goodsPage = goodsRepository.findByCategoryIdIn(categoryIdList, pageRequest);
         }
 
         return ServerResponse.createBySuccess(this.getPageChunk(goodsPage));
