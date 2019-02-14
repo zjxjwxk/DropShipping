@@ -1,14 +1,12 @@
 package com.zjut.dropshipping.controller;
 
 import com.zjut.dropshipping.common.Const;
+import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
@@ -44,5 +42,18 @@ public class ProducerController {
             session.setAttribute(Const.CURRENT_USER, response.getData());
         }
         return response;
+    }
+
+    @PostMapping("/get_recommend_producer")
+    @ResponseBody
+    public ServerResponse getRecommendProducer(HttpSession session,
+                                               @RequestParam(defaultValue = "1") Integer pageNumber,
+                                               @RequestParam(defaultValue = "10") Integer numberOfElements) {
+
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_USER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.getRecommendProducer(producer.getId(), pageNumber, numberOfElements);
     }
 }
