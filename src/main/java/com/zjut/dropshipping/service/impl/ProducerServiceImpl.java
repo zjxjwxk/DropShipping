@@ -3,12 +3,19 @@ package com.zjut.dropshipping.service.impl;
 import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Producer;
+import com.zjut.dropshipping.dto.PageChunk;
+import com.zjut.dropshipping.dto.RecommendProducerDTO;
 import com.zjut.dropshipping.repository.ProducerRepository;
 import com.zjut.dropshipping.service.ProducerService;
 import com.zjut.dropshipping.utils.MD5Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author ljx
@@ -108,5 +115,35 @@ public class ProducerServiceImpl implements ProducerService {
             return ServerResponse.createByErrorMessage("参数错误");
         }
         return ServerResponse.createBySuccessMessage("校验成功");
+    }
+
+    @Override
+    public ServerResponse  getRecommendProducer(Integer producerId, Integer pageNumber, Integer numberOfElements){
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
+        Page<Producer> producerPage = producerRepository.findAll(pageRequest);
+        return ServerResponse.createBySuccess(getPageChunk(producerPage));
+    }
+
+    private PageChunk<RecommendProducerDTO> getPageChunk(Page<Producer> producerPage) {
+        PageChunk<RecommendProducerDTO> pageChunk = new PageChunk<>();
+        pageChunk.setContent(getRecommendProducerDTO(producerPage.getContent()));
+        pageChunk.setTotalPages(producerPage.getTotalPages());
+        pageChunk.setTotalElements(producerPage.getTotalElements());
+        pageChunk.setPageNumber(producerPage.getPageable().getPageNumber() + 1);
+        pageChunk.setNumberOfElements(producerPage.getNumberOfElements());
+        return pageChunk;
+    }
+
+    private List<RecommendProducerDTO> getRecommendProducerDTO(List<Producer> producerList) {
+        List<RecommendProducerDTO> recommendProducerDTOList = new ArrayList<>();
+        for (Producer producer :
+                producerList) {
+            RecommendProducerDTO recommendProducerDTO = new RecommendProducerDTO();
+            recommendProducerDTO.setId(producer.getId());
+            recommendProducerDTO.setName(producer.getName());
+
+            recommendProducerDTOList.add(recommendProducerDTO);
+        }
+        return recommendProducerDTOList;
     }
 }
