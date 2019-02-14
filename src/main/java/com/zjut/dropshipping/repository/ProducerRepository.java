@@ -2,6 +2,8 @@ package com.zjut.dropshipping.repository;
 
 
 import com.zjut.dropshipping.dataobject.Producer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -20,4 +22,7 @@ public interface ProducerRepository extends JpaRepository<Producer, Integer> {
     Integer countByLicenseNumber(String name);
 
     Producer findByContactPhoneAndPassword(String contactPhone, String password);
+
+    @Override
+    Page<Producer> findAll(Pageable pageable);
 }
