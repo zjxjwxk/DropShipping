@@ -12,4 +12,6 @@ public interface ProducerService {
 
     ServerResponse<Producer> login(String contactPhone, String password);
 
+    ServerResponse getRecommendProducer(Integer producerId, Integer pageNumber, Integer numberOfElements);
+
 }
