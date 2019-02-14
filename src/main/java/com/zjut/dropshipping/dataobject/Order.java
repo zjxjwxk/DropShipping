@@ -21,6 +21,7 @@ public class Order {
     private Integer agentId;
     private Integer producerId;
     private Integer goodsId;
+    private Integer buyerId;
     private Integer number;
     private String state;
     private String remark;
