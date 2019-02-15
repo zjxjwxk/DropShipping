@@ -34,7 +34,7 @@ public class GoodsController {
                                   @RequestParam(value = "orderBy", defaultValue = "") String orderBy,
                                   HttpSession session) {
         if (inAgreement) {
-            Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+            Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
             if (agent == null) {
                 return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
             }
