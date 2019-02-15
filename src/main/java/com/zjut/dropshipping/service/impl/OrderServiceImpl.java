@@ -47,6 +47,9 @@ public class OrderServiceImpl implements OrderService {
         // 修改订单
         } else {
             order = orderRepository.findOneByOrderId(orderId);
+            if (order == null) {
+                return ServerResponse.createByErrorMessage("该订单不存在");
+            }
         }
         order.setAgentId(agentId);
         order.setGoodsId(goodsId);
