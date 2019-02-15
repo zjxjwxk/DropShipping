@@ -22,7 +22,7 @@ public class Order {
     private Integer producerId;
     private Integer goodsId;
     private Integer buyerId;
-    private Integer number;
+    private Integer amount;
     private String state;
     private String remark;
     @CreatedDate
