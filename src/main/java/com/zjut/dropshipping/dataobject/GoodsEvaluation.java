@@ -1,6 +1,7 @@
 package com.zjut.dropshipping.dataobject;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -21,5 +22,6 @@ public class GoodsEvaluation implements Serializable {
     private Integer agentId;
     private Integer level;
     private String content;
+    @CreatedDate
     private Date createTime;
 }
