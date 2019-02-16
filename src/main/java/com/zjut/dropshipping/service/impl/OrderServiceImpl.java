@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
         order.setGoodsId(goodsId);
         order.setBuyerId(buyer.getId());
         order.setAmount(amount);
-        order.setState(Const.OrderState.NORMAL);
+        order.setState(Const.OrderState.TO_BE_CONFIRMED);
         order.setRemark(remark);
         orderRepository.save(order);
 
