@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface BuyerRepository extends JpaRepository<Buyer, Integer> {
 
+    Buyer findBuyerById(Integer id);
+
     Buyer findByNameAndPhoneAndAddress(String name, String phone, String address);
 }
