@@ -80,7 +80,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public ServerResponse<Integer> getSalesVolume(Integer goodsId) {
-        Integer salesVolume = orderRepository.findSalesVolumeByGoodsId(goodsId);
+        Integer salesVolume = orderRepository.findAmountByGoodsId(goodsId);
         return ServerResponse.createBySuccess(salesVolume);
     }
 

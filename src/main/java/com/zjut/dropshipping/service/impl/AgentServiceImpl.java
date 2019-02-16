@@ -6,15 +6,21 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
 import com.zjut.dropshipping.dataobject.Producer;
+import com.zjut.dropshipping.dto.PageChunk;
 import com.zjut.dropshipping.dto.ProducerAgreementRequestDTO;
 import com.zjut.dropshipping.repository.AgentRepository;
 import com.zjut.dropshipping.repository.AgreementRepository;
+import com.zjut.dropshipping.repository.OrderRepository;
 import com.zjut.dropshipping.repository.ProducerRepository;
+import com.zjut.dropshipping.repository.EvaluationRepository;
 import com.zjut.dropshipping.service.AgentService;
 import com.zjut.dropshipping.utils.MD5Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import com.zjut.dropshipping.dto.RecommendAgentDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,14 +34,20 @@ public class AgentServiceImpl implements AgentService {
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
     private final AgreementRepository agreementRepository;
+    private final OrderRepository orderRepository;
+    private final EvaluationRepository evaluationRepository;
 
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository,
                             ProducerRepository producerRepository,
-                            AgreementRepository agreementRepository) {
+                            AgreementRepository agreementRepository,
+                            OrderRepository orderRepository,
+                            EvaluationRepository evaluationRepository ) {
         this.agentRepository = agentRepository;
         this.producerRepository = producerRepository;
         this.agreementRepository = agreementRepository;
+        this.orderRepository = orderRepository;
+        this.evaluationRepository = evaluationRepository;
     }
 
     @Override
@@ -180,5 +192,40 @@ public class AgentServiceImpl implements AgentService {
             return ServerResponse.createByErrorMessage("参数错误");
         }
         return ServerResponse.createBySuccessMessage("校验成功");
+    }
+
+
+    @Override
+    public ServerResponse  getRecommendAgent(Integer agentId, Integer pageNumber, Integer numberOfElements){
+
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
+        Page<Agent> agentPage = agentRepository.findByState(Const.AccountState.NORMAL, pageRequest);
+        return ServerResponse.createBySuccess(getPageChunk(agentPage));
+    }
+
+    private PageChunk<RecommendAgentDTO> getPageChunk(Page<Agent> agentPage) {
+        PageChunk<RecommendAgentDTO> pageChunk = new PageChunk<>();
+        pageChunk.setContent(getRecommendAgentDTO(agentPage.getContent()));
+        pageChunk.setTotalPages(agentPage.getTotalPages());
+        pageChunk.setTotalElements(agentPage.getTotalElements());
+        pageChunk.setPageNumber(agentPage.getPageable().getPageNumber() + 1);
+        pageChunk.setNumberOfElements(agentPage.getNumberOfElements());
+        return pageChunk;
+    }
+
+    private List<RecommendAgentDTO> getRecommendAgentDTO(List<Agent> agentList) {
+        List<RecommendAgentDTO> recommendAgentDTOList = new ArrayList<>();
+        for (Agent agent :
+                agentList) {
+            RecommendAgentDTO recommendAgentDTO = new RecommendAgentDTO();
+            recommendAgentDTO.setId(agent.getId());
+            recommendAgentDTO.setName(agent.getName());
+            recommendAgentDTO.setMonthlysale(orderRepository.findAmountByAgentId(agent.getId()));
+            recommendAgentDTO.setRegion(agent.getRegion());
+            recommendAgentDTO.setLevel(evaluationRepository.findLevelByAgentId(agent.getId()));
+
+            recommendAgentDTOList.add(recommendAgentDTO);
+        }
+        return recommendAgentDTOList;
     }
 }

@@ -7,7 +7,7 @@ package com.zjut.dropshipping.common;
 public class Const {
 
     public static final String CURRENT_USER = "currentUser";
-
+    public static final String PRODUCERTOAGENT = "1";
     public static final String PHONE = "phone";
     public static final String IDENTITY_NUMBER = "identityNumber";
     public static final String EXTERNAL_SHOP = "externalShop";
