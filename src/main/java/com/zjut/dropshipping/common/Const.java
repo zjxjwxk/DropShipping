@@ -8,7 +8,9 @@ public class Const {
 
     public static final String CURRENT_AGENT = "currentAgent";
     public static final String CURRENT_PRODUCER = "currentProducer";
-
+  
+    public static final String PRODUCERTOAGENT = "1";
+    
     public static final String PHONE = "phone";
     public static final String IDENTITY_NUMBER = "identityNumber";
     public static final String EXTERNAL_SHOP = "externalShop";

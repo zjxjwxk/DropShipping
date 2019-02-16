@@ -29,6 +29,9 @@ public class AgentController {
         this.fileService = fileService;
     }
 
+
+
+
     @PostMapping("/register")
     @ResponseBody
     public ServerResponse register(Agent agent, HttpSession session) {
@@ -99,4 +102,18 @@ public class AgentController {
         }
         return agentService.responseProducerAgreementRequest(agent.getId(), producerId, response);
     }
+
+    @PostMapping("/get_recommend_agent")
+    @ResponseBody
+    public ServerResponse getRecommendPAgent(HttpSession session,
+                                             @RequestParam(defaultValue = "1") Integer pageNumber,
+                                             @RequestParam(defaultValue = "10") Integer numberOfElements) {
+
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return agentService.getRecommendAgent(agent.getId(), pageNumber, numberOfElements);
+    }
+
 }

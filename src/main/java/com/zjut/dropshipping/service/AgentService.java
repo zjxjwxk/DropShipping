@@ -17,4 +17,6 @@ public interface AgentService {
     ServerResponse getProducerAgreementRequest(Integer agentId);
 
     ServerResponse responseProducerAgreementRequest(Integer agentId, Integer producerId, String response);
+
+    ServerResponse getRecommendAgent(Integer agentId, Integer pageNumber, Integer numberOfElements);
 }
