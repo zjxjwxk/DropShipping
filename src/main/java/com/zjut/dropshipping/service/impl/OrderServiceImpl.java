@@ -2,16 +2,10 @@ package com.zjut.dropshipping.service.impl;
 
 import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ServerResponse;
-import com.zjut.dropshipping.dataobject.Buyer;
-import com.zjut.dropshipping.dataobject.Goods;
-import com.zjut.dropshipping.dataobject.Order;
-import com.zjut.dropshipping.dataobject.Producer;
+import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.OrderDTO;
 import com.zjut.dropshipping.dto.OrderDetailDTO;
-import com.zjut.dropshipping.repository.BuyerRepository;
-import com.zjut.dropshipping.repository.GoodsRepository;
-import com.zjut.dropshipping.repository.OrderRepository;
-import com.zjut.dropshipping.repository.ProducerRepository;
+import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,16 +23,19 @@ public class OrderServiceImpl implements OrderService {
     private final BuyerRepository buyerRepository;
     private final GoodsRepository goodsRepository;
     private final ProducerRepository producerRepository;
+    private final LogisticRepository logisticRepository;
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             BuyerRepository buyerRepository,
                             GoodsRepository goodsRepository,
-                            ProducerRepository producerRepository) {
+                            ProducerRepository producerRepository,
+                            LogisticRepository logisticRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
         this.producerRepository = producerRepository;
+        this.logisticRepository = logisticRepository;
     }
 
 
@@ -105,7 +102,9 @@ public class OrderServiceImpl implements OrderService {
             orderDTO.setOrderId(order.getOrderId());
             orderDTO.setGoodsId(order.getGoodsId());
             orderDTO.setGoodsName(goods.getName());
+            orderDTO.setPrice(goods.getPrice());
             orderDTO.setAmount(order.getAmount());
+            orderDTO.setState(order.getState());
             orderDTO.setCreateTime(order.getCreateTime());
             orderDTO.setBuyerName(buyer.getName());
             orderDTO.setBuyerPhone(buyer.getPhone());
@@ -121,14 +120,38 @@ public class OrderServiceImpl implements OrderService {
         Goods goods = goodsRepository.findByGoodsId(order.getGoodsId());
         Producer producer = producerRepository.findOneById(goods.getProducerId());
         Buyer buyer = buyerRepository.findBuyerById(order.getBuyerId());
+        Logistic logistic = logisticRepository.findByOrderId(order.getOrderId());
+
         orderDetailDTO.setOrderId(order.getOrderId());
+        orderDetailDTO.setOrderState(order.getState());
+
         orderDetailDTO.setProducerId(goods.getProducerId());
         orderDetailDTO.setProducerName(producer.getName());
         orderDetailDTO.setRegion(producer.getRegion());
+
+        orderDetailDTO.setGoodsContent(goods.getContent());
+        orderDetailDTO.setGoodsPrice(goods.getPrice());
+
         orderDetailDTO.setBuyerName(buyer.getName());
         orderDetailDTO.setBuyerPhone(buyer.getPhone());
         orderDetailDTO.setBuyerAddress(buyer.getAddress());
         orderDetailDTO.setBuyerRemark(order.getRemark());
+
+        if (logistic == null) {
+            orderDetailDTO.setLogisticId(null);
+            orderDetailDTO.setLogisticNumber(null);
+            orderDetailDTO.setLogisticName(null);
+            orderDetailDTO.setLogisticPrice(null);
+            orderDetailDTO.setLogisticState(null);
+            orderDetailDTO.setDeliveryDate(null);
+        } else {
+            orderDetailDTO.setLogisticId(logistic.getLogisticId());
+            orderDetailDTO.setLogisticNumber(logistic.getLogisticNumber());
+            orderDetailDTO.setLogisticName(logistic.getName());
+            orderDetailDTO.setLogisticPrice(logistic.getPrice());
+            orderDetailDTO.setLogisticState(logistic.getState());
+            orderDetailDTO.setDeliveryDate(logistic.getDeliveryDate());
+        }
 
         return orderDetailDTO;
     }
