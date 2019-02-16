@@ -1,6 +1,8 @@
 package com.zjut.dropshipping.dataobject;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -18,6 +20,8 @@ public class Category {
     private Integer parentId;
     private String name;
     private Integer rank;
+    @CreatedDate
     private Date createTime;
+    @LastModifiedDate
     private Date updateTime;
 }

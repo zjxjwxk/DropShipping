@@ -2,6 +2,9 @@ package com.zjut.dropshipping.service;
 
 import com.zjut.dropshipping.common.ServerResponse;
 
+/**
+ * @author zjxjwxk
+ */
 public interface GoodsService {
 
     ServerResponse getList(String keyword, Integer categoryId, Integer agreementAgentId,

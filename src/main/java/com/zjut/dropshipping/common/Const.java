@@ -6,8 +6,11 @@ package com.zjut.dropshipping.common;
  */
 public class Const {
 
-    public static final String CURRENT_USER = "currentUser";
+    public static final String CURRENT_AGENT = "currentAgent";
+    public static final String CURRENT_PRODUCER = "currentProducer";
+  
     public static final String PRODUCERTOAGENT = "1";
+    
     public static final String PHONE = "phone";
     public static final String IDENTITY_NUMBER = "identityNumber";
     public static final String EXTERNAL_SHOP = "externalShop";
@@ -31,6 +34,11 @@ public class Const {
         String AGENT_REQUEST = "代理发送请求";
 
         String PRODUCER_REQUEST = "厂商发送请求";
+    }
+
+    public interface OrderState {
+
+        String NORMAL = "正常";
     }
 
     public interface AgreementResponse {
