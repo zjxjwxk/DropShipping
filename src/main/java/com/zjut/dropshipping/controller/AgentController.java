@@ -109,7 +109,7 @@ public class AgentController {
                                              @RequestParam(defaultValue = "1") Integer pageNumber,
                                              @RequestParam(defaultValue = "10") Integer numberOfElements) {
 
-        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
