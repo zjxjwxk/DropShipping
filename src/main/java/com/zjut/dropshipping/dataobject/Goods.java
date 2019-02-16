@@ -2,6 +2,8 @@ package com.zjut.dropshipping.dataobject;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -23,7 +25,9 @@ public class Goods {
     private Double price;
     private Integer stock;
     private String state;
+    @CreatedDate
     private Date createTime;
+    @LastModifiedDate
     private Date updateTime;
     private String content;
 }

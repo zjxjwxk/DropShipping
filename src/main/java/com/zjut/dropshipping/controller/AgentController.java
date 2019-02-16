@@ -37,7 +37,7 @@ public class AgentController {
     public ServerResponse register(Agent agent, HttpSession session) {
         ServerResponse response = agentService.register(agent);
         if (response.isSuccess()) {
-            session.setAttribute(Const.CURRENT_USER, agent);
+            session.setAttribute(Const.CURRENT_AGENT, agent);
         }
 
         return response;
@@ -48,7 +48,7 @@ public class AgentController {
     public ServerResponse<Agent> login(String phone, String password, HttpSession session) {
         ServerResponse<Agent> response = agentService.login(phone, password);
         if (response.isSuccess()) {
-            session.setAttribute(Const.CURRENT_USER, response.getData());
+            session.setAttribute(Const.CURRENT_AGENT, response.getData());
         }
 
         return response;
@@ -59,7 +59,7 @@ public class AgentController {
     public ServerResponse upload(HttpSession session, HttpServletRequest request,
                                  @RequestParam(value = "upload_file") MultipartFile file,
                                  @RequestParam(value = "type")String type) {
-        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
@@ -70,7 +70,7 @@ public class AgentController {
     @PostMapping("/request_agreement")
     @ResponseBody
     public ServerResponse requestAgreement(HttpSession session, Integer producerId) {
-        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
@@ -86,7 +86,7 @@ public class AgentController {
     @GetMapping("/get_producer_agreement_request")
     @ResponseBody
     public ServerResponse getProducerAgreementRequest(HttpSession session) {
-        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
@@ -96,7 +96,7 @@ public class AgentController {
     @PostMapping("/response_producer_agreement_request")
     @ResponseBody
     public ServerResponse responseProducerAgreementRequest(HttpSession session, Integer producerId, String response) {
-        Agent agent = (Agent) session.getAttribute(Const.CURRENT_USER);
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }

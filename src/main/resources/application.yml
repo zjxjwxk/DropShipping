@@ -10,3 +10,5 @@ spring:
     multipart:
       max-file-size: 2048MB
       max-request-size: 2048MB
+  jackson:
+    time-zone: GMT+8

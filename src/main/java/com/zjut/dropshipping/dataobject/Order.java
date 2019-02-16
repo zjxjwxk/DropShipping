@@ -2,30 +2,32 @@ package com.zjut.dropshipping.dataobject;
 
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * @author zjxjwxk
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @Table(name = "order")
 public class Order {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
     private Integer agentId;
-    private Integer producerId;
     private Integer goodsId;
     private Integer buyerId;
-    private Integer number;
+    private Integer amount;
     private String state;
     private String remark;
     @CreatedDate
     private Date createTime;
+    @LastModifiedDate
     private Date updateTime;
 }
