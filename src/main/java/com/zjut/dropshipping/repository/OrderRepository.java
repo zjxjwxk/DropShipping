@@ -9,9 +9,11 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-    @Query(value="select sum(amount) from Order where goodsId = ?1", nativeQuery = true)
+    Order findOneByOrderId(Integer orderId);
+
+    @Query("select sum(amount) from Order where goodsId = ?1")
     Integer findAmountByGoodsId(Integer goodsId);
 
-    @Query(value="select sum(amount) from Order where agentId = ?1", nativeQuery = true)
+    @Query("select sum(amount) from Order where agentId = ?1")
     Integer findAmountByAgentId(Integer agentId);
 }
