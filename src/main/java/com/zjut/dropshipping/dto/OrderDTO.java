@@ -13,7 +13,9 @@ public class OrderDTO {
     private Integer orderId;
     private Integer goodsId;
     private String goodsName;
+    private Double price;
     private Integer amount;
+    private String state;
     private Date createTime;
 
     private String buyerName;
