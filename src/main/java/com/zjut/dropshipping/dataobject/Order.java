@@ -15,15 +15,14 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @Table(name = "`order`")
-public class Order {
+public class    Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
     private Integer agentId;
-    private Integer goodsId;
     private Integer buyerId;
-    private Integer amount;
+    private Integer producerId;
     private String state;
     private String remark;
     @CreatedDate
