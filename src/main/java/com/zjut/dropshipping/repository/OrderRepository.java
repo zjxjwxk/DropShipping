@@ -15,9 +15,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     List<Order> findByAgentId(Integer agentId);
 
-    @Query("select sum(amount) from Order where goodsId = ?1")
-    Integer findAmountByGoodsId(Integer goodsId);
-
-    @Query("select sum(amount) from Order where agentId = ?1")
-    Integer findAmountByAgentId(Integer agentId);
+    @Query(value = "SELECT SUM(amount) from order_item WHERE order_id IN (SELECT order_id from `order` WHERE agent_id = ?1)", nativeQuery = true)
+    Integer findTotalAmountByAgentId(Integer agentId);
 }
