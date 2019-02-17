@@ -220,7 +220,7 @@ public class AgentServiceImpl implements AgentService {
             RecommendAgentDTO recommendAgentDTO = new RecommendAgentDTO();
             recommendAgentDTO.setId(agent.getId());
             recommendAgentDTO.setName(agent.getName());
-            recommendAgentDTO.setMonthlysale(orderRepository.findAmountByAgentId(agent.getId()));
+            recommendAgentDTO.setMonthlysale(orderRepository.findTotalAmountByAgentId(agent.getId()));
             recommendAgentDTO.setRegion(agent.getRegion());
             recommendAgentDTO.setLevel(evaluationRepository.findLevelByAgentId(agent.getId()));
 
