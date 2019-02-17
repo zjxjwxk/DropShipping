@@ -27,6 +27,7 @@ public class GoodsServiceImpl implements GoodsService {
     private final ProducerRepository producerRepository;
     private final OrderRepository orderRepository;
     private final AgreementRepository agreementRepository;
+    private final OrderItemRepository orderItemRepository;
 
     private final CategoryService categoryService;
 
@@ -37,7 +38,8 @@ public class GoodsServiceImpl implements GoodsService {
                             ProducerRepository producerRepository,
                             OrderRepository orderRepository,
                             AgreementRepository agreementRepository,
-                            CategoryService categoryService) {
+                            CategoryService categoryService,
+                            OrderItemRepository orderItemRepository) {
         this.goodsRepository = goodsRepository;
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
@@ -45,6 +47,7 @@ public class GoodsServiceImpl implements GoodsService {
         this.orderRepository = orderRepository;
         this.agreementRepository = agreementRepository;
         this.categoryService = categoryService;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @Override
@@ -80,7 +83,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public ServerResponse<Integer> getSalesVolume(Integer goodsId) {
-        Integer salesVolume = orderRepository.findAmountByGoodsId(goodsId);
+        Integer salesVolume = orderItemRepository.findTotalAmountByGoodsId(goodsId);
         return ServerResponse.createBySuccess(salesVolume);
     }
 
