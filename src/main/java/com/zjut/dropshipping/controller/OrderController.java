@@ -36,4 +36,21 @@ public class OrderController {
         }
         return orderService.agentSaveOrder(orderId, agent.getId(), goodsId, amount, remark, buyerName, buyerPhone, address);
     }
+
+    @GetMapping("/agent_get_order_list")
+    @ResponseBody
+    public ServerResponse agentGetOrderList(HttpSession session) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.agentGetOrderList(agent.getId());
+    }
+
+    @GetMapping("/get_order_detail")
+    @ResponseBody
+    public ServerResponse getOrderDetail(Integer orderId) {
+
+        return orderService.getOrderDetail(orderId);
+    }
 }

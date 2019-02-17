@@ -38,7 +38,15 @@ public class Const {
 
     public interface OrderState {
 
-        String NORMAL = "正常";
+        String TO_BE_CONFIRMED = "待确认";
+
+        String TO_BE_RECEIVED = "待收货";
+
+        String COMPLETED = "已完成";
+
+        String REFUND = "退款";
+
+        String REJECTED = "驳回";
     }
 
     public interface AgreementResponse {
