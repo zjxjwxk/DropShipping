@@ -38,6 +38,11 @@ public class Producer {
     private String credibility;
     private String content;
 
+    public Producer(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public void setNull() {
         this.setContactIdentityNumber(null);
         this.setLicenseNumber(null);
