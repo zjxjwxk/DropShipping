@@ -15,9 +15,4 @@ public class GoodsDetailDTO {
     private Double price;
     private Integer stock;
     private String status;
-
-//    private Double averageLevel;
-//    private List<GoodsEvaluationDTO> goodsEvaluationList;
-//
-//    private ProducerDTO producer;
 }
