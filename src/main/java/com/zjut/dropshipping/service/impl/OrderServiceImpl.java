@@ -70,12 +70,13 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setAgentId(agentId);
 
-        this.saveOrderItemList(order.getOrderId(), orderItemList);
-
         order.setBuyerId(buyer.getId());
         order.setProducerId(goodsRepository.findByGoodsId(orderItemList.get(0).getGoodsId()).getProducerId());
         order.setState(Const.OrderState.TO_BE_CONFIRMED);
         order.setRemark(remark);
+
+        order = orderRepository.save(order);
+        this.saveOrderItemList(order.getOrderId(), orderItemList);
 
         return ServerResponse.createBySuccess(order);
     }
