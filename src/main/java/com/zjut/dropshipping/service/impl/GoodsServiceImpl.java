@@ -25,7 +25,6 @@ public class GoodsServiceImpl implements GoodsService {
     private final GoodsEvaluationRepository goodsEvaluationRepository;
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
-    private final OrderRepository orderRepository;
     private final AgreementRepository agreementRepository;
     private final OrderItemRepository orderItemRepository;
 
@@ -36,7 +35,6 @@ public class GoodsServiceImpl implements GoodsService {
                             GoodsEvaluationRepository goodsEvaluationRepository,
                             AgentRepository agentRepository,
                             ProducerRepository producerRepository,
-                            OrderRepository orderRepository,
                             AgreementRepository agreementRepository,
                             CategoryService categoryService,
                             OrderItemRepository orderItemRepository) {
@@ -44,7 +42,6 @@ public class GoodsServiceImpl implements GoodsService {
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
         this.producerRepository = producerRepository;
-        this.orderRepository = orderRepository;
         this.agreementRepository = agreementRepository;
         this.categoryService = categoryService;
         this.orderItemRepository = orderItemRepository;
@@ -63,7 +60,7 @@ public class GoodsServiceImpl implements GoodsService {
             goodsPage = goodsRepository.findByCategoryIdIn(categoryIdList, pageRequest);
         }
 
-        return ServerResponse.createBySuccess(this.getPageChunk(goodsPage));
+        return ServerResponse.createBySuccess(this.getPageChunk(goodsPage, agreementAgentId));
     }
 
     @Override
@@ -125,9 +122,9 @@ public class GoodsServiceImpl implements GoodsService {
         return goodsEvaluationDTOList;
     }
 
-    private PageChunk<Goods> getPageChunk(Page<Goods> goodsPage) {
-        PageChunk<Goods> pageChunk = new PageChunk<>();
-        pageChunk.setContent(this.getGoodsList(goodsPage.getContent()));
+    private PageChunk<GoodsListDTO> getPageChunk(Page<Goods> goodsPage, Integer agreementAgentId) {
+        PageChunk<GoodsListDTO> pageChunk = new PageChunk<>();
+        pageChunk.setContent(this.getGoodsListDTOList(goodsPage.getContent(), agreementAgentId));
         pageChunk.setTotalPages(goodsPage.getTotalPages());
         pageChunk.setTotalElements(goodsPage.getTotalElements());
         pageChunk.setPageNumber(goodsPage.getPageable().getPageNumber() + 1);
@@ -135,16 +132,21 @@ public class GoodsServiceImpl implements GoodsService {
         return pageChunk;
     }
 
-    private List<Goods> getGoodsList(List<Goods> goodsList) {
+    private List<GoodsListDTO> getGoodsListDTOList(List<Goods> goodsList, Integer agreementAgentId) {
+        List<GoodsListDTO> goodsListDTOList = new ArrayList<>();
         for (Goods goods :
                 goodsList) {
-            goods.setProducerId(null);
-            goods.setCategoryId(null);
-            goods.setStock(null);
-            goods.setState(null);
-            goods.setCreateTime(null);
-            goods.setUpdateTime(null);
+            GoodsListDTO goodsListDTO = new GoodsListDTO();
+            goodsListDTO.setGoodsId(goods.getGoodsId());
+            goodsListDTO.setName(goods.getName());
+            goodsListDTO.setPrice(goods.getPrice());
+            if (agreementAgentId != null) {
+                Producer producer = producerRepository.findOneById(goods.getProducerId());
+                goodsListDTO.setProducerId(producer.getId());
+                goodsListDTO.setProducerName(producer.getName());
+            }
+            goodsListDTOList.add(goodsListDTO);
         }
-        return goodsList;
+        return goodsListDTOList;
     }
 }
