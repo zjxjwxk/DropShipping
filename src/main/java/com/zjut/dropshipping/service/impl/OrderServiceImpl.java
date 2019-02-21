@@ -8,6 +8,7 @@ import com.zjut.dropshipping.dto.OrderDetailDTO;
 import com.zjut.dropshipping.dto.OrderItemDTO;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.OrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,8 @@ public class OrderServiceImpl implements OrderService {
     private final ProducerRepository producerRepository;
     private final LogisticRepository logisticRepository;
     private final OrderItemRepository orderItemRepository;
+    private final SpecificationRepository specificationRepository;
+    private final GoodsSpecItemRepository goodsSpecItemRepository;
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
@@ -33,13 +36,17 @@ public class OrderServiceImpl implements OrderService {
                             GoodsRepository goodsRepository,
                             ProducerRepository producerRepository,
                             LogisticRepository logisticRepository,
-                            OrderItemRepository orderItemRepository) {
+                            OrderItemRepository orderItemRepository,
+                            SpecificationRepository specificationRepository,
+                            GoodsSpecItemRepository goodsSpecItemRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
         this.producerRepository = producerRepository;
         this.logisticRepository = logisticRepository;
         this.orderItemRepository = orderItemRepository;
+        this.specificationRepository = specificationRepository;
+        this.goodsSpecItemRepository = goodsSpecItemRepository;
     }
 
 
@@ -146,7 +153,21 @@ public class OrderServiceImpl implements OrderService {
                 orderItemList) {
             OrderItemDTO orderItemDTO = new OrderItemDTO();
             Goods goods = goodsRepository.findByGoodsId(orderItem.getGoodsId());
+            String[] goodsSpecIds = orderItem.getGoodsSpecIds().split(";");
+            List<Specification> specificationList = new ArrayList<>();
+            if (StringUtils.isEmpty(goodsSpecIds[0])) {
+                specificationList = null;
+            } else {
+                for (String goodsSpecId :
+                        goodsSpecIds) {
+                    GoodsSpecItem goodsSpecItem = goodsSpecItemRepository.findByGoodsSpecId(Integer.parseInt(goodsSpecId));
+                    Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
+                    specificationList.add(specification);
+                }
+            }
+
             orderItemDTO.setGoodsId(goods.getGoodsId());
+            orderItemDTO.setSpecificationList(specificationList);
             orderItemDTO.setName(goods.getName());
             orderItemDTO.setAmount(orderItem.getAmount());
             orderItemDTO.setPrice(goods.getPrice());
