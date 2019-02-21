@@ -17,4 +17,6 @@ public interface GoodsService {
     ServerResponse getEvaluation(Integer goodsId);
 
     ServerResponse getProducer(Integer goodsId);
+
+    ServerResponse getSpecification(Integer goodsId);
 }
