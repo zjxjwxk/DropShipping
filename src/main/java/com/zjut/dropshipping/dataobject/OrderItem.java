@@ -15,5 +15,6 @@ public class OrderItem {
     @Id
     private Integer orderId;
     private Integer goodsId;
+    private String goodsSpecIds;
     private Integer amount;
 }
