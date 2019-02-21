@@ -9,4 +9,5 @@ class OrderItemMultiKeys implements Serializable {
 
     private Integer orderId;
     private Integer goodsId;
+    private String goodsSpecIds;
 }
