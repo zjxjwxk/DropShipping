@@ -110,6 +110,9 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItem orderItem:
              orderItemList) {
             orderItem.setOrderId(orderId);
+            if (orderItem.getGoodsSpecIds() == null) {
+                orderItem.setGoodsSpecIds("null");
+            }
             orderItemRepository.save(orderItem);
         }
     }
@@ -155,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
             Goods goods = goodsRepository.findByGoodsId(orderItem.getGoodsId());
             String[] goodsSpecIds = orderItem.getGoodsSpecIds().split(";");
             List<Specification> specificationList = new ArrayList<>();
-            if (StringUtils.isEmpty(goodsSpecIds[0])) {
+            if (("null".equals(goodsSpecIds[0]))) {
                 specificationList = null;
             } else {
                 for (String goodsSpecId :
