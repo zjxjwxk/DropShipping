@@ -107,6 +107,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void saveOrderItemList(Integer orderId, List<OrderItem> orderItemList) {
+        orderItemRepository.deleteByOrderId(orderId);
         for (OrderItem orderItem:
              orderItemList) {
             orderItem.setOrderId(orderId);
