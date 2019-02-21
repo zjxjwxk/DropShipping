@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Table;
 import java.util.Date;
 
 /**
@@ -14,6 +15,7 @@ import java.util.Date;
 @Entity
 @Data
 @IdClass(AgreementMultiKeys.class)
+@Table(name = "`agreement`")
 public class Agreement {
 
     @Id

@@ -1,5 +1,4 @@
 package com.zjut.dropshipping.dto;
-
 import lombok.Data;
 
 /**

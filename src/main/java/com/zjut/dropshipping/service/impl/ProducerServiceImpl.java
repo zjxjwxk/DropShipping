@@ -1,10 +1,16 @@
 package com.zjut.dropshipping.service.impl;
 
 import com.zjut.dropshipping.common.Const;
+import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
+import com.zjut.dropshipping.dataobject.Agent;
+import com.zjut.dropshipping.dataobject.Agreement;
 import com.zjut.dropshipping.dataobject.Producer;
-import com.zjut.dropshipping.dto.PageChunk;
-import com.zjut.dropshipping.dto.RecommendProducerDTO;
+import com.zjut.dropshipping.dto.*;
+import com.zjut.dropshipping.repository.AgentRepository;
+import com.zjut.dropshipping.repository.EvaluationRepository;
+import com.zjut.dropshipping.repository.OrderRepository;
+import com.zjut.dropshipping.repository.AgreementRepository;
 import com.zjut.dropshipping.repository.ProducerRepository;
 import com.zjut.dropshipping.service.ProducerService;
 import com.zjut.dropshipping.utils.MD5Util;
@@ -23,10 +29,21 @@ import java.util.List;
 @Service("ProducerService")
 public class ProducerServiceImpl implements ProducerService {
     private final ProducerRepository producerRepository;
-
+    private final AgentRepository agentRepository;
+    private final OrderRepository orderRepository;
+    private final EvaluationRepository evaluationRepository;
+    private final AgreementRepository agreementRepository;
     @Autowired
-    public ProducerServiceImpl(ProducerRepository producerRepository) {
+    public ProducerServiceImpl(ProducerRepository producerRepository,
+                               AgentRepository agentRepository,
+                               OrderRepository orderRepository,
+                               EvaluationRepository evaluationRepository,
+                               AgreementRepository agreementRepository) {
         this.producerRepository = producerRepository;
+        this.agentRepository = agentRepository;
+        this.orderRepository = orderRepository;
+        this.evaluationRepository = evaluationRepository;
+        this.agreementRepository = agreementRepository;
     }
 
     @Override
@@ -116,35 +133,138 @@ public class ProducerServiceImpl implements ProducerService {
         }
         return ServerResponse.createBySuccessMessage("校验成功");
     }
-
     @Override
-    public ServerResponse  getRecommendProducer(Integer producerId, Integer pageNumber, Integer numberOfElements){
-        PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
-        Page<Producer> producerPage = producerRepository.findAll(pageRequest);
-        return ServerResponse.createBySuccess(getPageChunk(producerPage));
+    public ServerResponse<String> producerRequestAgreement(Integer agentId, Integer producerId) {
+        Agreement agreement = agreementRepository.findByProducerIdAndAgentId(producerId, agentId);
+        Agreement agreement1 = new Agreement();
+        agreement1.setProducerId(producerId);
+        agreement1.setAgentId(agentId);
+        if (agreement == null) {
+            agreement1.setState("厂商发送请求");
+            agreementRepository.save(agreement1);
+            return ServerResponse.createBySuccess("请求发送成功");
+        } else if (agreement.getState().equals(Const.AgreementState.NORMAL)) {
+            return ServerResponse.createByErrorMessage("已达成协议");
+        } else if (agreement.getState().equals(Const.AgreementState.PRODUCER_REQUEST)) {
+            return ServerResponse.createByErrorMessage("请求已发送");
+        } else {
+            agreement1.setState(Const.AgreementState.NORMAL);
+            agreementRepository.save(agreement1);
+            return ServerResponse.createBySuccess("达成协议");
+        }
     }
 
-    private PageChunk<RecommendProducerDTO> getPageChunk(Page<Producer> producerPage) {
-        PageChunk<RecommendProducerDTO> pageChunk = new PageChunk<>();
-        pageChunk.setContent(getRecommendProducerDTO(producerPage.getContent()));
-        pageChunk.setTotalPages(producerPage.getTotalPages());
-        pageChunk.setTotalElements(producerPage.getTotalElements());
-        pageChunk.setPageNumber(producerPage.getPageable().getPageNumber() + 1);
-        pageChunk.setNumberOfElements(producerPage.getNumberOfElements());
+    @Override
+    public ServerResponse getAgentAgreementRequest(Integer producerId) {
+        List<Agreement> agreementList = agreementRepository.findByProducerIdAndState(producerId, Const.AgreementState.AGENT_REQUEST);
+        if (agreementList.size() == 0) {
+            return ServerResponse.createByErrorMessage("还没有厂商请求协议");
+        }
+        return ServerResponse.createBySuccess(this.getAgentAgreementRequestList(agreementList));
+    }
+
+    @Override
+    public ServerResponse responseAgentAgreementRequest(Integer producerId, Integer agentId, String response) {
+        Agreement agreement = new Agreement();
+        agreement.setAgentId(agentId);
+        agreement.setProducerId(producerId);
+        if (Const.AgreementResponse.ACCEPT.equals(response)) {
+            agreement.setState(Const.AgreementState.NORMAL);
+            agreementRepository.save(agreement);
+            return ServerResponse.createBySuccess("达成协议");
+        } else if (Const.AgreementResponse.REFUSE.equals(response)) {
+            agreementRepository.delete(agreement);
+            return ServerResponse.createBySuccess("已拒绝请求");
+        } else {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+    }
+
+    private List<AgentAgreementRequestDTO> getAgentAgreementRequestList(List<Agreement> agreementList) {
+        List<AgentAgreementRequestDTO> agentAgreementRequestDTOList = new ArrayList<>();
+        for (Agreement agreement :
+                agreementList) {
+            Agent agent = agentRepository.findOneById(agreement.getAgentId());
+            AgentAgreementRequestDTO agentAgreementRequestDTO = new AgentAgreementRequestDTO();
+            agentAgreementRequestDTO.setId(agent.getId());
+            agentAgreementRequestDTO.setName(agent.getName());
+            agentAgreementRequestDTO.setPhone(agent.getPhone());
+            agentAgreementRequestDTO.setRegion(agent.getRegion());
+            agentAgreementRequestDTO.setJoinTime(agent.getJoinTime());
+
+            agentAgreementRequestDTOList.add(agentAgreementRequestDTO);
+        }
+        return agentAgreementRequestDTOList;
+    }
+    @Override
+    public ServerResponse  getRecommendAgent(Integer producerId, Integer pageNumber, Integer numberOfElements){
+
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
+        Page<Agent> agentPage = agentRepository.findAllByState(Const.AccountState.NORMAL, pageRequest);
+        return ServerResponse.createBySuccess(getRecommendPageChunk(agentPage));
+    }
+
+    private PageChunk<RecommendAgentDTO> getRecommendPageChunk(Page<Agent> agentPage) {
+        PageChunk<RecommendAgentDTO> pageChunk = new PageChunk<>();
+        pageChunk.setContent(getRecommendAgentDTO(agentPage.getContent()));
+        pageChunk.setTotalPages(agentPage.getTotalPages());
+        pageChunk.setTotalElements(agentPage.getTotalElements());
+        pageChunk.setPageNumber(agentPage.getPageable().getPageNumber() + 1);
+        pageChunk.setNumberOfElements(agentPage.getNumberOfElements());
+        return pageChunk;
+    }
+    private List<RecommendAgentDTO> getRecommendAgentDTO(List<Agent> agentList) {
+        List<RecommendAgentDTO> recommendAgentDTOList = new ArrayList<>();
+        for (Agent agent :
+                agentList) {
+            RecommendAgentDTO recommendAgentDTO = new RecommendAgentDTO();
+            recommendAgentDTO.setId(agent.getId());
+            recommendAgentDTO.setName(agent.getName());
+            recommendAgentDTO.setMonthlysale(orderRepository.findAmountByAgentId(agent.getId()));
+            recommendAgentDTO.setRegion(agent.getRegion());
+            recommendAgentDTO.setLevel(evaluationRepository.findLevelByAgentId(agent.getId()));
+
+            recommendAgentDTOList.add(recommendAgentDTO);
+        }
+        return recommendAgentDTOList;
+    }
+
+
+
+    @Override
+    public ServerResponse getAcceptedAgent(Integer producerId, Integer pageNumber, Integer numberOfElements){
+
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
+        Page<Agent> agentPage = agentRepository.findAcceptedAgentByProducerId(producerId, pageRequest);
+        return ServerResponse.createBySuccess(getAcceptedPageChunk(agentPage));
+    }
+
+
+
+    private PageChunk<AcceptedAgentDTO> getAcceptedPageChunk(Page<Agent> agentPage) {
+        PageChunk<AcceptedAgentDTO> pageChunk = new PageChunk<>();
+        pageChunk.setContent(getAcceptedAgentDTO(agentPage.getContent()));
+        pageChunk.setTotalPages(agentPage.getTotalPages());
+        pageChunk.setTotalElements(agentPage.getTotalElements());
+        pageChunk.setPageNumber(agentPage.getPageable().getPageNumber() + 1);
+        pageChunk.setNumberOfElements(agentPage.getNumberOfElements());
         return pageChunk;
     }
 
-    private List<RecommendProducerDTO> getRecommendProducerDTO(List<Producer> producerList) {
-        List<RecommendProducerDTO> recommendProducerDTOList = new ArrayList<>();
-        for (Producer producer :
-                producerList) {
-            RecommendProducerDTO recommendProducerDTO = new RecommendProducerDTO();
-            recommendProducerDTO.setId(producer.getId());
-            recommendProducerDTO.setName(producer.getName());
+    private List<AcceptedAgentDTO> getAcceptedAgentDTO(List<Agent> agentList) {
+        List<AcceptedAgentDTO> AcceptedAgentDTOList = new ArrayList<>();
+        for (Agent agent :
+                agentList) {
+            AcceptedAgentDTO acceptedAgentDTO = new AcceptedAgentDTO();
+            acceptedAgentDTO.setId(agent.getId());
+            acceptedAgentDTO.setName(agent.getName());
+            acceptedAgentDTO.setMonthlysale(orderRepository.findAmountByAgentId(agent.getId()));
+            acceptedAgentDTO.setRegion(agent.getRegion());
+            acceptedAgentDTO.setLevel(evaluationRepository.findLevelByAgentId(agent.getId()));
 
-            recommendProducerDTOList.add(recommendProducerDTO);
+            AcceptedAgentDTOList.add(acceptedAgentDTO);
         }
-        return recommendProducerDTOList;
+        return AcceptedAgentDTOList;
     }
 
 
