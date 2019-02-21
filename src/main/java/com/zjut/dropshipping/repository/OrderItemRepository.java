@@ -2,7 +2,9 @@ package com.zjut.dropshipping.repository;
 
 import com.zjut.dropshipping.dataobject.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,4 +17,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     @Query("select sum(amount) from OrderItem where goodsId = ?1")
     Integer findTotalAmountByGoodsId(Integer goodsId);
+
+    @Modifying
+    @Transactional
+    void deleteByOrderId(Integer orderId);
 }
