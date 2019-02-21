@@ -1,8 +1,11 @@
 package com.zjut.dropshipping.dto;
 
+import com.zjut.dropshipping.dataobject.Buyer;
+import com.zjut.dropshipping.dataobject.Logistic;
+import com.zjut.dropshipping.dataobject.Producer;
 import lombok.Data;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * @author zjxjwxk
@@ -11,15 +14,10 @@ import java.util.Date;
 public class OrderDTO {
 
     private Integer orderId;
-    private Integer goodsId;
-    private String goodsName;
-    private Double price;
-    private Integer amount;
     private String state;
-    private Date createTime;
 
-    private String buyerName;
-    private String buyerPhone;
-    private String buyerAddress;
-
+    private Buyer buyer;
+    private List<OrderItemDTO> orderItemList;
+    private Logistic logistic;
+    private Producer producer;
 }

@@ -5,8 +5,10 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.OrderDTO;
 import com.zjut.dropshipping.dto.OrderDetailDTO;
+import com.zjut.dropshipping.dto.OrderItemDTO;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.OrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,24 +26,34 @@ public class OrderServiceImpl implements OrderService {
     private final GoodsRepository goodsRepository;
     private final ProducerRepository producerRepository;
     private final LogisticRepository logisticRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final SpecificationRepository specificationRepository;
+    private final GoodsSpecItemRepository goodsSpecItemRepository;
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             BuyerRepository buyerRepository,
                             GoodsRepository goodsRepository,
                             ProducerRepository producerRepository,
-                            LogisticRepository logisticRepository) {
+                            LogisticRepository logisticRepository,
+                            OrderItemRepository orderItemRepository,
+                            SpecificationRepository specificationRepository,
+                            GoodsSpecItemRepository goodsSpecItemRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
         this.producerRepository = producerRepository;
         this.logisticRepository = logisticRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.specificationRepository = specificationRepository;
+        this.goodsSpecItemRepository = goodsSpecItemRepository;
     }
 
 
     @Override
-    public ServerResponse agentSaveOrder(Integer orderId, Integer agentId, Integer goodsId,
-                                         Integer amount, String remark, String buyerName,
+    public ServerResponse agentSaveOrder(Integer orderId, Integer agentId,
+                                         List<OrderItem> orderItemList,
+                                         String remark, String buyerName,
                                          String buyerPhone, String address) {
         Buyer buyer = buyerRepository.findByNameAndPhoneAndAddress(buyerName, buyerPhone, address);
         if (buyer == null) {
@@ -64,12 +76,14 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         order.setAgentId(agentId);
-        order.setGoodsId(goodsId);
+
         order.setBuyerId(buyer.getId());
-        order.setAmount(amount);
+        order.setProducerId(goodsRepository.findByGoodsId(orderItemList.get(0).getGoodsId()).getProducerId());
         order.setState(Const.OrderState.TO_BE_CONFIRMED);
         order.setRemark(remark);
-        orderRepository.save(order);
+
+        order = orderRepository.save(order);
+        this.saveOrderItemList(order.getOrderId(), orderItemList);
 
         return ServerResponse.createBySuccess(order);
     }
@@ -92,66 +106,93 @@ public class OrderServiceImpl implements OrderService {
         return ServerResponse.createBySuccess(this.getOrderDetailDTO(order));
     }
 
+    private void saveOrderItemList(Integer orderId, List<OrderItem> orderItemList) {
+        orderItemRepository.deleteByOrderId(orderId);
+        for (OrderItem orderItem:
+             orderItemList) {
+            orderItem.setOrderId(orderId);
+            if (orderItem.getGoodsSpecIds() == null) {
+                orderItem.setGoodsSpecIds("null");
+            }
+            orderItemRepository.save(orderItem);
+        }
+    }
+
     private List<OrderDTO> getOrderDTOList(List<Order> orderList) {
         List<OrderDTO> orderDTOList = new ArrayList<>();
         for (Order order :
                 orderList) {
             OrderDTO orderDTO = new OrderDTO();
-            Goods goods = goodsRepository.findByGoodsId(order.getGoodsId());
+
+            List<OrderItem> orderItemList = orderItemRepository.findByOrderId(order.getOrderId());
             Buyer buyer = buyerRepository.findBuyerById(order.getBuyerId());
+            Logistic logistic = logisticRepository.findByOrderId(order.getOrderId());
+            Producer producer = producerRepository.findIdAndNameById(order.getProducerId());
+
             orderDTO.setOrderId(order.getOrderId());
-            orderDTO.setGoodsId(order.getGoodsId());
-            orderDTO.setGoodsName(goods.getName());
-            orderDTO.setPrice(goods.getPrice());
-            orderDTO.setAmount(order.getAmount());
             orderDTO.setState(order.getState());
-            orderDTO.setCreateTime(order.getCreateTime());
-            orderDTO.setBuyerName(buyer.getName());
-            orderDTO.setBuyerPhone(buyer.getPhone());
-            orderDTO.setBuyerAddress(buyer.getAddress());
+
+            buyer.setAddress(null);
+            orderDTO.setBuyer(buyer);
+
+            orderDTO.setOrderItemList(this.getOrderItemDTOList(orderItemList));
+
+            if (logistic != null) {
+                logistic.setOrderId(null);
+                logistic.setDeliveryDate(null);
+                logistic.setPrice(null);
+            }
+            orderDTO.setLogistic(logistic);
+
+            orderDTO.setProducer(producer);
 
             orderDTOList.add(orderDTO);
         }
         return orderDTOList;
     }
 
+    private List<OrderItemDTO> getOrderItemDTOList(List<OrderItem> orderItemList) {
+        List<OrderItemDTO> orderItemDTOList = new ArrayList<>();
+        for (OrderItem orderItem :
+                orderItemList) {
+            OrderItemDTO orderItemDTO = new OrderItemDTO();
+            Goods goods = goodsRepository.findByGoodsId(orderItem.getGoodsId());
+            String[] goodsSpecIds = orderItem.getGoodsSpecIds().split(";");
+            List<Specification> specificationList = new ArrayList<>();
+            if (("null".equals(goodsSpecIds[0]))) {
+                specificationList = null;
+            } else {
+                for (String goodsSpecId :
+                        goodsSpecIds) {
+                    GoodsSpecItem goodsSpecItem = goodsSpecItemRepository.findByGoodsSpecId(Integer.parseInt(goodsSpecId));
+                    Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
+                    specificationList.add(specification);
+                }
+            }
+
+            orderItemDTO.setGoodsId(goods.getGoodsId());
+            orderItemDTO.setSpecificationList(specificationList);
+            orderItemDTO.setName(goods.getName());
+            orderItemDTO.setAmount(orderItem.getAmount());
+            orderItemDTO.setPrice(goods.getPrice());
+
+            orderItemDTOList.add(orderItemDTO);
+        }
+        return orderItemDTOList;
+    }
+
     private OrderDetailDTO getOrderDetailDTO(Order order) {
         OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
-        Goods goods = goodsRepository.findByGoodsId(order.getGoodsId());
-        Producer producer = producerRepository.findOneById(goods.getProducerId());
-        Buyer buyer = buyerRepository.findBuyerById(order.getBuyerId());
         Logistic logistic = logisticRepository.findByOrderId(order.getOrderId());
+        Buyer buyer = buyerRepository.findBuyerById(order.getBuyerId());
 
-        orderDetailDTO.setOrderId(order.getOrderId());
-        orderDetailDTO.setOrderState(order.getState());
-
-        orderDetailDTO.setProducerId(goods.getProducerId());
-        orderDetailDTO.setProducerName(producer.getName());
-        orderDetailDTO.setRegion(producer.getRegion());
-
-        orderDetailDTO.setGoodsContent(goods.getContent());
-        orderDetailDTO.setGoodsPrice(goods.getPrice());
-
-        orderDetailDTO.setBuyerName(buyer.getName());
-        orderDetailDTO.setBuyerPhone(buyer.getPhone());
-        orderDetailDTO.setBuyerAddress(buyer.getAddress());
-        orderDetailDTO.setBuyerRemark(order.getRemark());
-
-        if (logistic == null) {
-            orderDetailDTO.setLogisticId(null);
-            orderDetailDTO.setLogisticNumber(null);
-            orderDetailDTO.setLogisticName(null);
-            orderDetailDTO.setLogisticPrice(null);
-            orderDetailDTO.setLogisticState(null);
-            orderDetailDTO.setDeliveryDate(null);
-        } else {
-            orderDetailDTO.setLogisticId(logistic.getLogisticId());
-            orderDetailDTO.setLogisticNumber(logistic.getLogisticNumber());
-            orderDetailDTO.setLogisticName(logistic.getName());
-            orderDetailDTO.setLogisticPrice(logistic.getPrice());
-            orderDetailDTO.setLogisticState(logistic.getState());
-            orderDetailDTO.setDeliveryDate(logistic.getDeliveryDate());
+        if (logistic != null) {
+            logistic.setOrderId(null);
         }
+        orderDetailDTO.setLogistic(logistic);
+
+        buyer.setId(null);
+        orderDetailDTO.setBuyer(buyer);
 
         return orderDetailDTO;
     }

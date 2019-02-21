@@ -21,9 +21,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
     private Integer agentId;
-    private Integer goodsId;
     private Integer buyerId;
-    private Integer amount;
+    private Integer producerId;
     private String state;
     private String remark;
     @CreatedDate

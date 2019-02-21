@@ -1,5 +1,6 @@
 package com.zjut.dropshipping.dataobject;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Logistic {
 
     @Id
