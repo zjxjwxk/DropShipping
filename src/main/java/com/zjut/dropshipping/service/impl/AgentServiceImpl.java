@@ -6,8 +6,7 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
 import com.zjut.dropshipping.dataobject.Producer;
-import com.zjut.dropshipping.dto.PageChunk;
-import com.zjut.dropshipping.dto.ProducerAgreementRequestDTO;
+import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.AgentRepository;
 import com.zjut.dropshipping.repository.AgreementRepository;
 import com.zjut.dropshipping.repository.OrderRepository;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import com.zjut.dropshipping.dto.RecommendAgentDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,20 +32,17 @@ public class AgentServiceImpl implements AgentService {
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
     private final AgreementRepository agreementRepository;
-    private final OrderRepository orderRepository;
-    private final EvaluationRepository evaluationRepository;
+
 
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository,
                             ProducerRepository producerRepository,
-                            AgreementRepository agreementRepository,
-                            OrderRepository orderRepository,
-                            EvaluationRepository evaluationRepository ) {
+                            AgreementRepository agreementRepository
+                            ) {
         this.agentRepository = agentRepository;
         this.producerRepository = producerRepository;
         this.agreementRepository = agreementRepository;
-        this.orderRepository = orderRepository;
-        this.evaluationRepository = evaluationRepository;
+
     }
 
     @Override
@@ -194,38 +189,38 @@ public class AgentServiceImpl implements AgentService {
         return ServerResponse.createBySuccessMessage("校验成功");
     }
 
-
     @Override
-    public ServerResponse  getRecommendAgent(Integer agentId, Integer pageNumber, Integer numberOfElements){
-
+    public ServerResponse  getRecommendProducer(Integer agentId, Integer pageNumber, Integer numberOfElements){
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
-        Page<Agent> agentPage = agentRepository.findByState(Const.AccountState.NORMAL, pageRequest);
-        return ServerResponse.createBySuccess(getPageChunk(agentPage));
+        Page<Producer> producerPage = producerRepository.findAllByState(Const.AccountState.NORMAL,pageRequest);
+        return ServerResponse.createBySuccess(getPageChunk(producerPage));
     }
 
-    private PageChunk<RecommendAgentDTO> getPageChunk(Page<Agent> agentPage) {
-        PageChunk<RecommendAgentDTO> pageChunk = new PageChunk<>();
-        pageChunk.setContent(getRecommendAgentDTO(agentPage.getContent()));
-        pageChunk.setTotalPages(agentPage.getTotalPages());
-        pageChunk.setTotalElements(agentPage.getTotalElements());
-        pageChunk.setPageNumber(agentPage.getPageable().getPageNumber() + 1);
-        pageChunk.setNumberOfElements(agentPage.getNumberOfElements());
+    private PageChunk<RecommendProducerDTO> getPageChunk(Page<Producer> producerPage) {
+        PageChunk<RecommendProducerDTO> pageChunk = new PageChunk<>();
+        pageChunk.setContent(getRecommendProducerDTO(producerPage.getContent()));
+        pageChunk.setTotalPages(producerPage.getTotalPages());
+        pageChunk.setTotalElements(producerPage.getTotalElements());
+        pageChunk.setPageNumber(producerPage.getPageable().getPageNumber() + 1);
+        pageChunk.setNumberOfElements(producerPage.getNumberOfElements());
         return pageChunk;
     }
 
-    private List<RecommendAgentDTO> getRecommendAgentDTO(List<Agent> agentList) {
-        List<RecommendAgentDTO> recommendAgentDTOList = new ArrayList<>();
-        for (Agent agent :
-                agentList) {
-            RecommendAgentDTO recommendAgentDTO = new RecommendAgentDTO();
-            recommendAgentDTO.setId(agent.getId());
-            recommendAgentDTO.setName(agent.getName());
-            recommendAgentDTO.setMonthlysale(orderRepository.findAmountByAgentId(agent.getId()));
-            recommendAgentDTO.setRegion(agent.getRegion());
-            recommendAgentDTO.setLevel(evaluationRepository.findLevelByAgentId(agent.getId()));
+    private List<RecommendProducerDTO> getRecommendProducerDTO(List<Producer> producerList) {
+        List<RecommendProducerDTO> recommendProducerDTOList = new ArrayList<>();
+        for (Producer producer :
+                producerList) {
+            RecommendProducerDTO recommendProducerDTO = new RecommendProducerDTO();
+            recommendProducerDTO.setId(producer.getId());
+            recommendProducerDTO.setName(producer.getName());
 
-            recommendAgentDTOList.add(recommendAgentDTO);
+            recommendProducerDTOList.add(recommendProducerDTO);
         }
-        return recommendAgentDTOList;
+        return recommendProducerDTOList;
     }
+
+
+
+
+
 }

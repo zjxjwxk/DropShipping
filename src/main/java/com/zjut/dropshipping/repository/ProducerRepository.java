@@ -23,6 +23,6 @@ public interface ProducerRepository extends JpaRepository<Producer, Integer> {
 
     Producer findByContactPhoneAndPassword(String contactPhone, String password);
 
-    @Override
-    Page<Producer> findAll(Pageable pageable);
+
+    Page<Producer> findAllByState(String state, Pageable pageable);
 }

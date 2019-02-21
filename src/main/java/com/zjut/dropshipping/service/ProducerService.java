@@ -12,7 +12,14 @@ public interface ProducerService {
 
     ServerResponse<Producer> login(String contactPhone, String password);
 
-    ServerResponse getRecommendProducer(Integer producerId, Integer pageNumber, Integer numberOfElements);
+    ServerResponse<String> producerRequestAgreement(Integer agentId, Integer producerId);
 
+    ServerResponse getAgentAgreementRequest(Integer producerId);
+
+    ServerResponse responseAgentAgreementRequest(Integer producerId, Integer agentId, String response);
+
+    ServerResponse getRecommendAgent(Integer agentId, Integer pageNumber, Integer numberOfElements);
+
+    ServerResponse getAcceptedAgent(Integer producerId, Integer pageNumber, Integer numberOfElements);
 
 }
