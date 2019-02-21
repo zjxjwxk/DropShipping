@@ -66,4 +66,10 @@ public class GoodsController {
     public ServerResponse getSalesVolume(Integer goodsId) {
         return goodsService.getSalesVolume(goodsId);
     }
+
+    @GetMapping("/get_specification")
+    @ResponseBody
+    public ServerResponse getSpecification(Integer goodsId) {
+        return null;
+    }
 }
