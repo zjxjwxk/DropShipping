@@ -15,6 +15,7 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Table(name = "`agent`")
 public class Agent {
 
     @Id

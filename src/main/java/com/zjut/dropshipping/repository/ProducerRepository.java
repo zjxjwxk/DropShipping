@@ -24,9 +24,12 @@ public interface ProducerRepository extends JpaRepository<Producer, Integer> {
 
     Producer findByContactPhoneAndPassword(String contactPhone, String password);
 
+    Page<Producer> findAllByState(String state, Pageable pageable);
+
     @Override
     Page<Producer> findAll(Pageable pageable);
 
     @Query("select new Producer(producer.id, producer.name) from Producer producer where id = ?1")
     Producer findIdAndNameById(Integer id);
+
 }

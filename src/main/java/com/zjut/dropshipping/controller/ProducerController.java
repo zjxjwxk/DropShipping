@@ -3,6 +3,7 @@ package com.zjut.dropshipping.controller;
 import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
+import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +45,68 @@ public class ProducerController {
         return response;
     }
 
-    @GetMapping("/get_recommend_producer")
+
+
+    @GetMapping("/get_recommend_agent")
     @ResponseBody
-    public ServerResponse getRecommendProducer(HttpSession session,
-                                               @RequestParam(defaultValue = "1") Integer pageNumber,
-                                               @RequestParam(defaultValue = "10") Integer numberOfElements) {
+    public ServerResponse getRecommendAgent(HttpSession session,
+                                             @RequestParam(defaultValue = "1") Integer pageNumber,
+                                             @RequestParam(defaultValue = "10") Integer numberOfElements) {
 
         Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
         if (producer == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        return producerService.getRecommendProducer(producer.getId(), pageNumber, numberOfElements);
+        return producerService.getRecommendAgent(producer.getId(), pageNumber, numberOfElements);
     }
+
+    @GetMapping("/get_accepted_agent")
+    @ResponseBody
+    public ServerResponse getAcceptedAgent(HttpSession session,
+                                            @RequestParam(defaultValue = "1") Integer pageNumber,
+                                            @RequestParam(defaultValue = "10") Integer numberOfElements) {
+
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.getAcceptedAgent(producer.getId(), pageNumber, numberOfElements);
+    }
+
+    @PostMapping("/producer_request_agreement")
+    @ResponseBody
+    public ServerResponse producerRequestAgreement(HttpSession session, Integer agentId) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        if (producer.getState().equals(Const.AccountState.UNREVIEWED)) {
+            return ServerResponse.createByErrorMessage("还未进行实名认证或审核还未通过");
+        } else if (producer.getState().equals(Const.AccountState.FROZEN)) {
+            return ServerResponse.createByErrorMessage("账号已冻结");
+        } else {
+            return producerService.producerRequestAgreement(agentId, producer.getId());
+        }
+    }
+
+    @GetMapping("/get_agent_agreement_request")
+    @ResponseBody
+    public ServerResponse getProducerAgreementRequest(HttpSession session) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.getAgentAgreementRequest(producer.getId());
+    }
+
+    @PostMapping("/response_agent_agreement_request")
+    @ResponseBody
+    public ServerResponse responseAgentAgreementRequest(HttpSession session, Integer agentId, String response) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.responseAgentAgreementRequest(producer.getId(), agentId, response);
+    }
+
 }

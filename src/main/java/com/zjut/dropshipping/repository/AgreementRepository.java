@@ -15,6 +15,8 @@ public interface AgreementRepository extends JpaRepository<Agreement, Integer> {
 
     List<Agreement> findByAgentIdAndState(Integer agentId, String state);
 
+    List<Agreement> findByProducerIdAndState(Integer producerId, String state);
+
     @Query("select producerId from Agreement where agentId = ?1 and state = ?2")
     List<Integer> findProducerIdListByAgentIdAndState(Integer agentId, String state);
 }
