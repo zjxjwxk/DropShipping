@@ -27,6 +27,8 @@ public class GoodsServiceImpl implements GoodsService {
     private final ProducerRepository producerRepository;
     private final AgreementRepository agreementRepository;
     private final OrderItemRepository orderItemRepository;
+    private final SpecificationRepository specificationRepository;
+    private final GoodsSpecItemRepository goodsSpecItemRepository;
 
     private final CategoryService categoryService;
 
@@ -37,7 +39,9 @@ public class GoodsServiceImpl implements GoodsService {
                             ProducerRepository producerRepository,
                             AgreementRepository agreementRepository,
                             CategoryService categoryService,
-                            OrderItemRepository orderItemRepository) {
+                            OrderItemRepository orderItemRepository,
+                            SpecificationRepository specificationRepository,
+                            GoodsSpecItemRepository goodsSpecItemRepository) {
         this.goodsRepository = goodsRepository;
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
@@ -45,6 +49,8 @@ public class GoodsServiceImpl implements GoodsService {
         this.agreementRepository = agreementRepository;
         this.categoryService = categoryService;
         this.orderItemRepository = orderItemRepository;
+        this.specificationRepository = specificationRepository;
+        this.goodsSpecItemRepository = goodsSpecItemRepository;
     }
 
     @Override
@@ -103,6 +109,22 @@ public class GoodsServiceImpl implements GoodsService {
         producer.setNull();
 
         return ServerResponse.createBySuccess(producer);
+    }
+
+    @Override
+    public ServerResponse getSpecification(Integer goodsId) {
+        List<GoodsSpecItem> goodsSpecItemList = goodsSpecItemRepository.findByGoodsId(goodsId);
+        List<Specification> specificationList = new ArrayList<>();
+        if (goodsSpecItemList.size() == 0) {
+            return ServerResponse.createBySuccess(null);
+        } else {
+            for (GoodsSpecItem goodsSpecItem:
+                    goodsSpecItemList) {
+                Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
+                specificationList.add(specification);
+            }
+        }
+        return ServerResponse.createBySuccess(specificationList);
     }
 
     private List<GoodsEvaluationDTO> getEvaluationList(List<GoodsEvaluation> goodsEvaluationList) {
