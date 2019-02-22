@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.Query;
 
+
 /**
  * @author zjxjwxk
  */
@@ -25,4 +26,6 @@ public interface AgentRepository extends JpaRepository<Agent, Integer> {
 
     @Query(value="select * from agent where id in (select agent_id from agreement where producer_id =?1 and state='正常') and state='正常' ", nativeQuery = true)
     Page<Agent> findAcceptedAgentByProducerId(Integer producerId, Pageable pageable);
+
+
 }

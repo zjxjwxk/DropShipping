@@ -109,4 +109,14 @@ public class ProducerController {
         return producerService.responseAgentAgreementRequest(producer.getId(), agentId, response);
     }
 
+    @GetMapping("/get_detail_agent")
+    @ResponseBody
+    public ServerResponse getDetailAgent(HttpSession session,Integer agentId) {
+
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.getDetailAgent(agentId);
+    }
 }

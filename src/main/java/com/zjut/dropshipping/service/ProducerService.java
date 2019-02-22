@@ -22,4 +22,6 @@ public interface ProducerService {
 
     ServerResponse getAcceptedAgent(Integer producerId, Integer pageNumber, Integer numberOfElements);
 
+    ServerResponse getDetailAgent(Integer agentId);
+
 }
