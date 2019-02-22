@@ -12,6 +12,7 @@ import com.zjut.dropshipping.repository.EvaluationRepository;
 import com.zjut.dropshipping.repository.OrderRepository;
 import com.zjut.dropshipping.repository.AgreementRepository;
 import com.zjut.dropshipping.repository.ProducerRepository;
+import com.zjut.dropshipping.repository.CategoryRepository;
 import com.zjut.dropshipping.service.ProducerService;
 import com.zjut.dropshipping.utils.MD5Util;
 import org.apache.commons.lang3.StringUtils;
@@ -33,17 +34,20 @@ public class ProducerServiceImpl implements ProducerService {
     private final OrderRepository orderRepository;
     private final EvaluationRepository evaluationRepository;
     private final AgreementRepository agreementRepository;
+    private final CategoryRepository categoryRepository;
     @Autowired
     public ProducerServiceImpl(ProducerRepository producerRepository,
                                AgentRepository agentRepository,
                                OrderRepository orderRepository,
                                EvaluationRepository evaluationRepository,
-                               AgreementRepository agreementRepository) {
+                               AgreementRepository agreementRepository,
+                               CategoryRepository categoryRepository) {
         this.producerRepository = producerRepository;
         this.agentRepository = agentRepository;
         this.orderRepository = orderRepository;
         this.evaluationRepository = evaluationRepository;
         this.agreementRepository = agreementRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -133,6 +137,7 @@ public class ProducerServiceImpl implements ProducerService {
         }
         return ServerResponse.createBySuccessMessage("校验成功");
     }
+
     @Override
     public ServerResponse<String> producerRequestAgreement(Integer agentId, Integer producerId) {
         Agreement agreement = agreementRepository.findByProducerIdAndAgentId(producerId, agentId);
@@ -267,8 +272,24 @@ public class ProducerServiceImpl implements ProducerService {
         return AcceptedAgentDTOList;
     }
 
+    @Override
+    public ServerResponse getDetailAgent(Integer agentId){
+        Agent agent = agentRepository.findOneById(agentId);
+        return ServerResponse.createBySuccess(getAgentDetailDTO(agent));
+    }
 
 
+    private AgentDetailDTO getAgentDetailDTO(Agent agent) {
+
+            AgentDetailDTO agentDetailDTO = new AgentDetailDTO();
+            agentDetailDTO.setPhone(agent.getPhone());
+            agentDetailDTO.setExternalShop(agent.getExternalShop());
+            agentDetailDTO.setJoinTime(agent.getJoinTime());
+            agentDetailDTO.setLevel(evaluationRepository.findLevelByAgentId(agent.getId()));
+            agentDetailDTO.setProductSaleList(categoryRepository.findProductSaleListByAgentId(agent.getId()));
+
+        return agentDetailDTO;
+    }
 
 
 
