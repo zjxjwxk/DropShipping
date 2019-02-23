@@ -116,12 +116,22 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public ServerResponse getProducerAgreementRequest(Integer agentId) {
-        List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.PRODUCER_REQUEST);
-        if (agreementList.size() == 0) {
-            return ServerResponse.createByErrorMessage("还没有厂商请求协议");
+    public ServerResponse getAgreementProducer(Integer agentId, String state) {
+        if (Const.AgreementState.PRODUCER_REQUEST.equals(state)) {
+            List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.PRODUCER_REQUEST);
+            if (agreementList.size() == 0) {
+                return ServerResponse.createByErrorMessage("还没有厂商请求协议");
+            }
+            return ServerResponse.createBySuccess(this.getProducerAgreementRequestList(agreementList));
+        } else if (Const.AgreementState.NORMAL.equals(state)) {
+            List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.NORMAL);
+            if (agreementList.size() == 0) {
+                return ServerResponse.createByErrorMessage("还没有合作的厂商");
+            }
+            return ServerResponse.createBySuccess(this.getAgreementProducerList(agreementList));
+        } else {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
-        return ServerResponse.createBySuccess(this.getProducerAgreementRequestList(agreementList));
     }
 
     @Override
@@ -146,15 +156,6 @@ public class AgentServiceImpl implements AgentService {
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
         Page<Producer> producerPage = producerRepository.findAllByState(Const.AccountState.NORMAL,pageRequest);
         return ServerResponse.createBySuccess(getPageChunk(producerPage));
-    }
-
-    @Override
-    public ServerResponse getAgreementProducer(Integer agentId) {
-        List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.NORMAL);
-        if (agreementList.size() == 0) {
-            return ServerResponse.createByErrorMessage("还没有合作的厂商");
-        }
-        return ServerResponse.createBySuccess(this.getAgreementProducerList(agreementList));
     }
 
     private List<Producer> getAgreementProducerList(List<Agreement> agreementList) {
