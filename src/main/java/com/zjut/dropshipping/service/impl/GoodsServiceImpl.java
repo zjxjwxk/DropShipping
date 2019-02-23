@@ -10,6 +10,8 @@ import com.zjut.dropshipping.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -57,13 +59,13 @@ public class GoodsServiceImpl implements GoodsService {
     public ServerResponse getList(String keyword, Integer categoryId, Integer agreementAgentId, Integer pageNum, Integer pageSize,
                                   String orderBy) {
         List<Integer> categoryIdList = categoryService.getCategoryAndChildrenIdListByParentId(categoryId);
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, pageSize);
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
         Page<Goods> goodsPage;
         if (agreementAgentId != null) {
             List<Integer> producerIdList = agreementRepository.findProducerIdListByAgentIdAndState(agreementAgentId, Const.AgreementState.NORMAL);
-            goodsPage = goodsRepository.findByProducerIdInAndCategoryIdIn(producerIdList, categoryIdList, pageRequest);
+            goodsPage = goodsRepository.findByProducerIdInAndCategoryIdIn(producerIdList, categoryIdList, pageable);
         } else {
-            goodsPage = goodsRepository.findByCategoryIdIn(categoryIdList, pageRequest);
+            goodsPage = goodsRepository.findByCategoryIdIn(categoryIdList, pageable);
         }
 
         return ServerResponse.createBySuccess(this.getPageChunk(goodsPage, agreementAgentId));
