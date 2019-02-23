@@ -18,9 +18,9 @@ public interface ProducerService {
 
     ServerResponse responseAgentAgreementRequest(Integer producerId, Integer agentId, String response);
 
-    ServerResponse getRecommendAgent(Integer agentId, Integer pageNumber, Integer numberOfElements);
+    ServerResponse getRecommendAgent(Integer pageNumber, Integer numberOfElements);
 
-    ServerResponse getAcceptedAgent(Integer producerId, Integer pageNumber, Integer numberOfElements);
+    ServerResponse getAcceptedAgent(Integer producerId,Integer pageNumber, Integer numberOfElements);
 
     ServerResponse getDetailAgent(Integer agentId);
 

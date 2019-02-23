@@ -1,6 +1,7 @@
 package com.zjut.dropshipping.dto;
 
 import lombok.Data;
+import org.apache.commons.net.ntp.TimeStamp;
 
 import java.util.Date;
 
@@ -15,4 +16,8 @@ public class AgentAgreementRequestDTO {
     private String phone;
     private String region;
     private Date joinTime;
+    private Date requestTime;
+    private Integer monthlysale;
+    private Integer level;
+
 }

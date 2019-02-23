@@ -165,7 +165,7 @@ public class ProducerServiceImpl implements ProducerService {
         if (agreementList.size() == 0) {
             return ServerResponse.createByErrorMessage("还没有厂商请求协议");
         }
-        return ServerResponse.createBySuccess(this.getAgentAgreementRequestList(agreementList));
+        return ServerResponse.createBySuccess(this.getAgentAgreementRequestList(agreementList,producerId));
     }
 
     @Override
@@ -173,6 +173,7 @@ public class ProducerServiceImpl implements ProducerService {
         Agreement agreement = new Agreement();
         agreement.setAgentId(agentId);
         agreement.setProducerId(producerId);
+
         if (Const.AgreementResponse.ACCEPT.equals(response)) {
             agreement.setState(Const.AgreementState.NORMAL);
             agreementRepository.save(agreement);
@@ -185,8 +186,9 @@ public class ProducerServiceImpl implements ProducerService {
         }
     }
 
-    private List<AgentAgreementRequestDTO> getAgentAgreementRequestList(List<Agreement> agreementList) {
+    private List<AgentAgreementRequestDTO> getAgentAgreementRequestList(List<Agreement> agreementList,Integer producerId) {
         List<AgentAgreementRequestDTO> agentAgreementRequestDTOList = new ArrayList<>();
+
         for (Agreement agreement :
                 agreementList) {
             Agent agent = agentRepository.findOneById(agreement.getAgentId());
@@ -196,13 +198,16 @@ public class ProducerServiceImpl implements ProducerService {
             agentAgreementRequestDTO.setPhone(agent.getPhone());
             agentAgreementRequestDTO.setRegion(agent.getRegion());
             agentAgreementRequestDTO.setJoinTime(agent.getJoinTime());
+            agentAgreementRequestDTO.setRequestTime(agreementRepository.findTimeByProducerIdAndAgentId(producerId ,agent.getId()));
+            agentAgreementRequestDTO.setMonthlysale(orderRepository.findAmountByAgentId(agent.getId()));
+            agentAgreementRequestDTO.setLevel(evaluationRepository.findLevelByAgentId(agent.getId()));
 
             agentAgreementRequestDTOList.add(agentAgreementRequestDTO);
         }
         return agentAgreementRequestDTOList;
     }
     @Override
-    public ServerResponse  getRecommendAgent(Integer producerId, Integer pageNumber, Integer numberOfElements){
+    public ServerResponse  getRecommendAgent(Integer pageNumber, Integer numberOfElements){
 
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
         Page<Agent> agentPage = agentRepository.findAllByState(Const.AccountState.NORMAL, pageRequest);
@@ -237,7 +242,7 @@ public class ProducerServiceImpl implements ProducerService {
 
 
     @Override
-    public ServerResponse getAcceptedAgent(Integer producerId, Integer pageNumber, Integer numberOfElements){
+    public ServerResponse getAcceptedAgent(Integer producerId,Integer pageNumber, Integer numberOfElements){
 
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
         Page<Agent> agentPage = agentRepository.findAcceptedAgentByProducerId(producerId, pageRequest);
