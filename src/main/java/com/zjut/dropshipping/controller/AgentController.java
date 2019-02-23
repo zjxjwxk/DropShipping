@@ -114,7 +114,7 @@ public class AgentController {
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        return agentService.getRecommendProducer(agent.getId(), pageNumber, numberOfElements);
+        return agentService.getRecommendProducer( pageNumber, numberOfElements);
     }
 
 
