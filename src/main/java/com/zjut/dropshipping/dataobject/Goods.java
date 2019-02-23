@@ -30,4 +30,10 @@ public class Goods {
     @LastModifiedDate
     private Date updateTime;
     private String content;
+
+    public Goods(Integer goodsId, String name, Double price) {
+        this.goodsId = goodsId;
+        this.name = name;
+        this.price = price;
+    }
 }
