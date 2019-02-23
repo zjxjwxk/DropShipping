@@ -31,7 +31,7 @@ public class GoodsController {
                                   @RequestParam(value = "inAgreement", defaultValue = "false") Boolean inAgreement,
                                   @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-                                  @RequestParam(value = "orderBy", defaultValue = "") String orderBy,
+                                  @RequestParam(value = "orderBy", defaultValue = "amount") String orderBy,
                                   HttpSession session) {
         if (inAgreement) {
             Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
@@ -70,6 +70,6 @@ public class GoodsController {
     @GetMapping("/get_specification")
     @ResponseBody
     public ServerResponse getSpecification(Integer goodsId) {
-        return null;
+        return goodsService.getSpecification(goodsId);
     }
 }
