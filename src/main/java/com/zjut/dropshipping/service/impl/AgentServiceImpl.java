@@ -190,7 +190,7 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public ServerResponse  getRecommendProducer(Integer agentId, Integer pageNumber, Integer numberOfElements){
+    public ServerResponse  getRecommendProducer(Integer pageNumber, Integer numberOfElements){
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
         Page<Producer> producerPage = producerRepository.findAllByState(Const.AccountState.NORMAL,pageRequest);
         return ServerResponse.createBySuccess(getPageChunk(producerPage));

@@ -57,7 +57,7 @@ public class ProducerController {
         if (producer == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        return producerService.getRecommendAgent(producer.getId(), pageNumber, numberOfElements);
+        return producerService.getRecommendAgent( pageNumber, numberOfElements);
     }
 
     @GetMapping("/get_accepted_agent")

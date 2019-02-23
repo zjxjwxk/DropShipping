@@ -1,9 +1,11 @@
 package com.zjut.dropshipping.repository;
 
 import com.zjut.dropshipping.dataobject.Agreement;
+import org.apache.commons.net.ntp.TimeStamp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,6 +14,9 @@ import java.util.List;
 public interface AgreementRepository extends JpaRepository<Agreement, Integer> {
 
     Agreement findByProducerIdAndAgentId(Integer producerId, Integer agentId);
+
+    @Query("select time from Agreement where producer_id = ?1 and agent_id = ?2")
+    Date findTimeByProducerIdAndAgentId(Integer producerId, Integer agentId);
 
     List<Agreement> findByAgentIdAndState(Integer agentId, String state);
 
