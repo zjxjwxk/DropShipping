@@ -14,7 +14,7 @@ public interface AgentService {
 
     ServerResponse<String> requestAgreement(Integer producerId, Integer agentId);
 
-    ServerResponse getProducerAgreementRequest(Integer agentId);
+    ServerResponse getAgreementProducer(Integer agentId, String state);
 
     ServerResponse responseProducerAgreementRequest(Integer agentId, Integer producerId, String response);
 

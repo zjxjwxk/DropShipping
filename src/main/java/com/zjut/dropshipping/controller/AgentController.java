@@ -4,7 +4,6 @@ import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
-import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.AgentService;
 import com.zjut.dropshipping.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,14 +83,14 @@ public class AgentController {
         }
     }
 
-    @GetMapping("/get_producer_agreement_request")
+    @GetMapping("/get_agreement_producer")
     @ResponseBody
-    public ServerResponse getProducerAgreementRequest(HttpSession session) {
+    public ServerResponse getAgreementProducer(HttpSession session, String state) {
         Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        return agentService.getProducerAgreementRequest(agent.getId());
+        return agentService.getAgreementProducer(agent.getId(), state);
     }
 
     @PostMapping("/response_producer_agreement_request")

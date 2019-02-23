@@ -30,4 +30,5 @@ public class Goods {
     @LastModifiedDate
     private Date updateTime;
     private String content;
+
 }

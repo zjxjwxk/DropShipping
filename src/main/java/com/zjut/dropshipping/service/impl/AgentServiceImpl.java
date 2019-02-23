@@ -5,6 +5,7 @@ import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
+import com.zjut.dropshipping.dataobject.Goods;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.AgentRepository;
@@ -32,7 +33,6 @@ public class AgentServiceImpl implements AgentService {
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
     private final AgreementRepository agreementRepository;
-
 
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository,
@@ -116,12 +116,22 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public ServerResponse getProducerAgreementRequest(Integer agentId) {
-        List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.PRODUCER_REQUEST);
-        if (agreementList.size() == 0) {
-            return ServerResponse.createByErrorMessage("还没有厂商请求协议");
+    public ServerResponse getAgreementProducer(Integer agentId, String state) {
+        if (Const.AgreementState.PRODUCER_REQUEST.equals(state)) {
+            List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.PRODUCER_REQUEST);
+            if (agreementList.size() == 0) {
+                return ServerResponse.createByErrorMessage("还没有厂商请求协议");
+            }
+            return ServerResponse.createBySuccess(this.getProducerAgreementRequestList(agreementList));
+        } else if (Const.AgreementState.NORMAL.equals(state)) {
+            List<Agreement> agreementList = agreementRepository.findByAgentIdAndState(agentId, Const.AgreementState.NORMAL);
+            if (agreementList.size() == 0) {
+                return ServerResponse.createByErrorMessage("还没有合作的厂商");
+            }
+            return ServerResponse.createBySuccess(this.getAgreementProducerList(agreementList));
+        } else {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
-        return ServerResponse.createBySuccess(this.getProducerAgreementRequestList(agreementList));
     }
 
     @Override
@@ -139,6 +149,23 @@ public class AgentServiceImpl implements AgentService {
         } else {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
+    }
+
+    @Override
+    public ServerResponse getRecommendProducer(Integer pageNumber, Integer numberOfElements){
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
+        Page<Producer> producerPage = producerRepository.findAllByState(Const.AccountState.NORMAL,pageRequest);
+        return ServerResponse.createBySuccess(getPageChunk(producerPage));
+    }
+
+    private List<Producer> getAgreementProducerList(List<Agreement> agreementList) {
+        List<Producer> producerList = new ArrayList<>();
+        for (Agreement agreement:
+                agreementList) {
+            Producer producer = producerRepository.findOneById(agreement.getProducerId());
+            producerList.add(producer);
+        }
+        return producerList;
     }
 
     private List<ProducerAgreementRequestDTO> getProducerAgreementRequestList(List<Agreement> agreementList) {
@@ -189,13 +216,6 @@ public class AgentServiceImpl implements AgentService {
         return ServerResponse.createBySuccessMessage("校验成功");
     }
 
-    @Override
-    public ServerResponse  getRecommendProducer(Integer pageNumber, Integer numberOfElements){
-        PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
-        Page<Producer> producerPage = producerRepository.findAllByState(Const.AccountState.NORMAL,pageRequest);
-        return ServerResponse.createBySuccess(getPageChunk(producerPage));
-    }
-
     private PageChunk<RecommendProducerDTO> getPageChunk(Page<Producer> producerPage) {
         PageChunk<RecommendProducerDTO> pageChunk = new PageChunk<>();
         pageChunk.setContent(getRecommendProducerDTO(producerPage.getContent()));
@@ -218,9 +238,4 @@ public class AgentServiceImpl implements AgentService {
         }
         return recommendProducerDTOList;
     }
-
-
-
-
-
 }
