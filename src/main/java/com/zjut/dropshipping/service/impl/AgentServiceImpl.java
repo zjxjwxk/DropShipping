@@ -5,6 +5,7 @@ import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
+import com.zjut.dropshipping.dataobject.Goods;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.AgentRepository;
@@ -32,7 +33,6 @@ public class AgentServiceImpl implements AgentService {
     private final AgentRepository agentRepository;
     private final ProducerRepository producerRepository;
     private final AgreementRepository agreementRepository;
-
 
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository,
@@ -237,9 +237,4 @@ public class AgentServiceImpl implements AgentService {
         }
         return recommendProducerDTOList;
     }
-
-
-
-
-
 }
