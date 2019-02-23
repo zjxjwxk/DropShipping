@@ -118,7 +118,7 @@ public class GoodsServiceImpl implements GoodsService {
         List<GoodsSpecItem> goodsSpecItemList = goodsSpecItemRepository.findByGoodsId(goodsId);
         List<Specification> specificationList = new ArrayList<>();
         if (goodsSpecItemList.size() == 0) {
-            return ServerResponse.createBySuccess(null);
+            return ServerResponse.createByErrorMessage("该商品不存在或无可选规格");
         } else {
             for (GoodsSpecItem goodsSpecItem:
                     goodsSpecItemList) {
