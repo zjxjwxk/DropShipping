@@ -24,4 +24,6 @@ public interface ProducerService {
 
     ServerResponse getDetailAgent(Integer agentId);
 
+    ServerResponse addGoods(Integer producerId,String goodsName,Integer categoryId, Double price, Integer stock,String content);
+
 }

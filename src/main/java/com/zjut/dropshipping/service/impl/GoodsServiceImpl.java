@@ -173,4 +173,21 @@ public class GoodsServiceImpl implements GoodsService {
         }
         return goodsListDTOList;
     }
+
+    @Override
+    public ServerResponse addGoodsModel(Integer goodsId, String name, String value , Double price){
+        GoodsSpecItem goodsSpecItem = new GoodsSpecItem();
+        Specification specification = new Specification();
+        if(specificationRepository.findByName(name) != null && specificationRepository.findByValue(value) != null ){
+            return ServerResponse.createByErrorMessage("该型号已存在");
+        }else{
+            specification.setName(name);
+            specification.setValue(value);
+            specificationRepository.save(specification);
+            goodsSpecItem.setPriceDifference(price-goodsRepository.findPriceByGoodId(goodsId));
+            return ServerResponse.createBySuccessMessage("添加成功");
+        }
+
+    }
+
 }

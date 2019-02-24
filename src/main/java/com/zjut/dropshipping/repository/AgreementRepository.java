@@ -1,7 +1,6 @@
 package com.zjut.dropshipping.repository;
 
 import com.zjut.dropshipping.dataobject.Agreement;
-import org.apache.commons.net.ntp.TimeStamp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
