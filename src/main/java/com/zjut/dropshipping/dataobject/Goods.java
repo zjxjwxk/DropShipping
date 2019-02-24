@@ -6,6 +6,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Date;
 
@@ -18,6 +20,7 @@ import java.util.Date;
 public class Goods {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer goodsId;
     private Integer producerId;
     private Integer categoryId;

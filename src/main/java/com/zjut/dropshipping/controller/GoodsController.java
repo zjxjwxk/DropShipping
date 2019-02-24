@@ -72,4 +72,11 @@ public class GoodsController {
     public ServerResponse getSpecification(Integer goodsId) {
         return goodsService.getSpecification(goodsId);
     }
+
+    @PostMapping("/add_goods_model")
+    @ResponseBody
+    public ServerResponse addGoodsModel(Integer goodsId, String name, String value, Double price) {
+
+        return goodsService.addGoodsModel(goodsId, name, value, price);
+    }
 }

@@ -6,13 +6,10 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Agreement;
 import com.zjut.dropshipping.dataobject.Producer;
+import com.zjut.dropshipping.dataobject.Goods;
 import com.zjut.dropshipping.dto.*;
-import com.zjut.dropshipping.repository.AgentRepository;
-import com.zjut.dropshipping.repository.EvaluationRepository;
-import com.zjut.dropshipping.repository.OrderRepository;
-import com.zjut.dropshipping.repository.AgreementRepository;
-import com.zjut.dropshipping.repository.ProducerRepository;
-import com.zjut.dropshipping.repository.CategoryRepository;
+import com.zjut.dropshipping.repository.*;
+
 import com.zjut.dropshipping.service.ProducerService;
 import com.zjut.dropshipping.utils.MD5Util;
 import org.apache.commons.lang3.StringUtils;
@@ -35,19 +32,22 @@ public class ProducerServiceImpl implements ProducerService {
     private final EvaluationRepository evaluationRepository;
     private final AgreementRepository agreementRepository;
     private final CategoryRepository categoryRepository;
+    private final GoodsRepository goodsRepository;
     @Autowired
     public ProducerServiceImpl(ProducerRepository producerRepository,
                                AgentRepository agentRepository,
                                OrderRepository orderRepository,
                                EvaluationRepository evaluationRepository,
                                AgreementRepository agreementRepository,
-                               CategoryRepository categoryRepository) {
+                               CategoryRepository categoryRepository,
+                               GoodsRepository goodsRepository) {
         this.producerRepository = producerRepository;
         this.agentRepository = agentRepository;
         this.orderRepository = orderRepository;
         this.evaluationRepository = evaluationRepository;
         this.agreementRepository = agreementRepository;
         this.categoryRepository = categoryRepository;
+        this.goodsRepository = goodsRepository;
     }
 
     @Override
@@ -296,7 +296,25 @@ public class ProducerServiceImpl implements ProducerService {
         return agentDetailDTO;
     }
 
+    @Override
+    public ServerResponse addGoods(Integer producerId,
+                                   String goodsName,
+                                   Integer categoryId,
+                                   Double price,
+                                   Integer stock,
+                                   String content) {
 
+                Goods goods = new Goods();
+                goods.setProducerId(producerId);
+                goods.setCategoryId(categoryId);
+                goods.setName(goodsName);
+                goods.setPrice(price);
+                goods.setStock(stock);
+                goods.setState("正常");
+                goods.setContent(content);
+                goodsRepository.save(goods);
 
+                return ServerResponse.createBySuccess("商品添加成功");
 
+    }
 }

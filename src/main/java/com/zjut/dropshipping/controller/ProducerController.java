@@ -118,4 +118,22 @@ public class ProducerController {
         }
         return producerService.getDetailAgent(agentId);
     }
+
+    @PostMapping("/add_goods")
+    @ResponseBody
+    public ServerResponse addGoods(HttpSession session,
+                                   String goodsName,
+                                   Integer categoryId,
+                                   Double price,
+                                   Integer stock,
+
+                                   String content
+                                                        ) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.addGoods(producer.getId(), goodsName, categoryId,price,stock,content);
+    }
+
 }
