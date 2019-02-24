@@ -22,4 +22,13 @@ public class ShoppingCart {
     private Integer amount;
     @CreatedDate
     private Date createTime;
+
+    public ShoppingCart() {
+    }
+
+    public ShoppingCart(Integer agentId, String goodsSpecIds, Integer amount) {
+        this.agentId = agentId;
+        this.goodsSpecIds = goodsSpecIds;
+        this.amount = amount;
+    }
 }
