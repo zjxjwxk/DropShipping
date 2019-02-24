@@ -7,7 +7,7 @@ import com.zjut.dropshipping.common.ServerResponse;
  */
 public interface GoodsService {
 
-    ServerResponse getList(String keyword, Integer categoryId, Integer agreementAgentId,
+    ServerResponse getList(String keyword, Integer categoryId, Integer producerId, Integer agreementAgentId,
                            Integer pageNum, Integer pageSize, String orderBy);
 
     ServerResponse getDetail(Integer goodsId);
