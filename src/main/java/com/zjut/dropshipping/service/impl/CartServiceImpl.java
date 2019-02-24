@@ -57,6 +57,16 @@ public class CartServiceImpl implements CartService {
         return ServerResponse.createByErrorMessage("加入购物车失败");
     }
 
+    @Override
+    public ServerResponse delete(Integer agentId, String goodsSpecIds) {
+        ShoppingCart shoppingCart = cartRepository.findByGoodsSpecIds(goodsSpecIds);
+        if (shoppingCart == null) {
+            return ServerResponse.createByErrorMessage("购物车中没有该商品");
+        }
+        cartRepository.delete(shoppingCart);
+        return ServerResponse.createBySuccess("删除购物车商品成功");
+    }
+
     private Map<Integer, ShoppingCartItemListDTO> getShoppingCartMap(List<ShoppingCart> shoppingCartList) {
         Map<Integer, ShoppingCartItemListDTO> shoppingCartMap = new HashMap<>(5);
         for (ShoppingCart shoppingCart :

@@ -10,4 +10,6 @@ public interface CartService {
     ServerResponse getList(Integer agentId);
 
     ServerResponse add(Integer agentId, String goodsSpecIds, Integer amount);
+
+    ServerResponse delete(Integer agentId, String goodsSpecIds);
 }
