@@ -3,7 +3,6 @@ package com.zjut.dropshipping.controller;
 import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
-import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
