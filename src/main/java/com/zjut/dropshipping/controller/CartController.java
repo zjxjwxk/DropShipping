@@ -34,8 +34,13 @@ public class CartController {
         return cartService.getList(agent.getId());
     }
 
-//    @PostMapping("/add")
-//    @ResponseBody
-//    public ServerResponse add(HttpSession session,
-//                              @)
+    @PostMapping("/add")
+    @ResponseBody
+    public ServerResponse add(HttpSession session, String goodsSpecIds, Integer amount) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return cartService.add(agent.getId(), goodsSpecIds, amount);
+    }
 }
