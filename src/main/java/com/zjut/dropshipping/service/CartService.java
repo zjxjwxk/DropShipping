@@ -8,4 +8,6 @@ import com.zjut.dropshipping.common.ServerResponse;
 public interface CartService {
 
     ServerResponse getList(Integer agentId);
+
+    ServerResponse add(Integer agentId, String goodsSpecIds, Integer amount);
 }

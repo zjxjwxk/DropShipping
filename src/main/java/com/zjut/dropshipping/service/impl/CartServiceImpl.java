@@ -48,6 +48,15 @@ public class CartServiceImpl implements CartService {
         return ServerResponse.createBySuccess(this.getShoppingCartMap(shoppingCartList));
     }
 
+    @Override
+    public ServerResponse add(Integer agentId, String goodsSpecIds, Integer amount) {
+        ShoppingCart shoppingCart = new ShoppingCart(agentId, goodsSpecIds, amount);
+        if (cartRepository.save(shoppingCart) != null) {
+            return ServerResponse.createBySuccess("加入购物车成功");
+        }
+        return ServerResponse.createByErrorMessage("加入购物车失败");
+    }
+
     private Map<Integer, ShoppingCartItemListDTO> getShoppingCartMap(List<ShoppingCart> shoppingCartList) {
         Map<Integer, ShoppingCartItemListDTO> shoppingCartMap = new HashMap<>(5);
         for (ShoppingCart shoppingCart :
