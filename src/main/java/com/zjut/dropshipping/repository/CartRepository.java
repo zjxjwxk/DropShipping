@@ -11,4 +11,6 @@ import java.util.List;
 public interface CartRepository extends JpaRepository<ShoppingCart, Integer> {
 
     List<ShoppingCart> findByAgentId(Integer agentId);
+
+    ShoppingCart findByGoodsSpecIds(String goodsSpecIds);
 }
