@@ -12,4 +12,6 @@ public interface CartService {
     ServerResponse add(Integer agentId, String goodsSpecIds, Integer amount);
 
     ServerResponse delete(Integer agentId, String goodsSpecIds);
+
+    ServerResponse update(Integer agentId, String goodsSpecIds, Integer amount);
 }

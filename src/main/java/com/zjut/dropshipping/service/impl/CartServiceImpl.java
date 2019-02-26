@@ -59,12 +59,27 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ServerResponse delete(Integer agentId, String goodsSpecIds) {
-        ShoppingCart shoppingCart = cartRepository.findByGoodsSpecIds(goodsSpecIds);
+        ShoppingCart shoppingCart = cartRepository.findByAgentIdAndGoodsSpecIds(agentId, goodsSpecIds);
         if (shoppingCart == null) {
             return ServerResponse.createByErrorMessage("购物车中没有该商品");
         }
         cartRepository.delete(shoppingCart);
         return ServerResponse.createBySuccess("删除购物车商品成功");
+    }
+
+    @Override
+    public ServerResponse update(Integer agentId, String goodsSpecIds, Integer amount) {
+        ShoppingCart shoppingCart = cartRepository.findByAgentIdAndGoodsSpecIds(agentId, goodsSpecIds);
+        if (shoppingCart == null) {
+            return ServerResponse.createByErrorMessage("购物车中没有该商品");
+        } else {
+            shoppingCart.setAmount(amount);
+            if (cartRepository.save(shoppingCart) != null) {
+                return ServerResponse.createBySuccess("更新购物车商品数量成功");
+            } else {
+                return ServerResponse.createByErrorMessage("更新购物车商品数量失败");
+            }
+        }
     }
 
     private Map<Integer, ShoppingCartItemListDTO> getShoppingCartMap(List<ShoppingCart> shoppingCartList) {
