@@ -120,7 +120,7 @@ public class GoodsServiceImpl implements GoodsService {
         List<GoodsSpecItem> goodsSpecItemList = goodsSpecItemRepository.findByGoodsId(goodsId);
         List<SpecificationDTO> specificationDTOList = new ArrayList<>();
         if (goodsSpecItemList.size() == 0) {
-            return ServerResponse.createByErrorMessage("该商品不存在或无可选规格");
+            return ServerResponse.createByErrorMessage("该商品不存在");
         } else {
             for (GoodsSpecItem goodsSpecItem:
                     goodsSpecItemList) {
