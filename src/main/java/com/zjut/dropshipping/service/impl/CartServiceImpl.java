@@ -4,6 +4,7 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.ShoppingCartItemDTO;
 import com.zjut.dropshipping.dto.ShoppingCartItemListDTO;
+import com.zjut.dropshipping.dto.SpecificationDTO;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +90,7 @@ public class CartServiceImpl implements CartService {
             ShoppingCartItemDTO shoppingCartItemDTO = new ShoppingCartItemDTO();
             Goods goods = new Goods();
             String[] goodsSpecIds = shoppingCart.getGoodsSpecIds().split(";");
-            List<Specification> specificationList = new ArrayList<>();
+            List<SpecificationDTO> specificationDTOList = new ArrayList<>();
             // 遍历该商品的不同规格
             for (String goodsSpecId :
                     goodsSpecIds) {
@@ -103,11 +104,15 @@ public class CartServiceImpl implements CartService {
                 }
                 // 计算该规格的差价
                 shoppingCartItemDTO.addPrice(goodsSpecItem.getPriceDifference());
+
                 Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
-                specificationList.add(specification);
+                SpecificationDTO specificationDTO = new SpecificationDTO(Integer.parseInt(goodsSpecId),
+                        specification.getName(), specification.getValue(), null);
+                specificationDTOList.add(specificationDTO);
+
                 shoppingCartItemDTO.setAmount(shoppingCart.getAmount());
             }
-            shoppingCartItemDTO.setSpecificationList(specificationList);
+            shoppingCartItemDTO.setSpecificationDTOList(specificationDTOList);
 
             // 将购物车条目列表根据厂家id放入Map
             if (!shoppingCartMap.containsKey(goods.getProducerId())) {
