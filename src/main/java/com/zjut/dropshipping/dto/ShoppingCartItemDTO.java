@@ -14,7 +14,7 @@ public class ShoppingCartItemDTO {
     private Integer goodsId;
     private String goodsName;
 
-    private List<Specification> specificationList;
+    private List<SpecificationDTO> specificationDTOList;
 
     private Double price;
     private Integer amount;
