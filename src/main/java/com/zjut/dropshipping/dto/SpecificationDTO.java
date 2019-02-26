@@ -1,11 +1,13 @@
 package com.zjut.dropshipping.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
  * @author zjxjwxk
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SpecificationDTO {
 
     private Integer goodsSpecId;
