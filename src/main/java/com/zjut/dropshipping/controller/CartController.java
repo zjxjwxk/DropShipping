@@ -53,4 +53,14 @@ public class CartController {
         }
         return cartService.delete(agent.getId(), goodsSpecIds);
     }
+
+    @PostMapping("/update")
+    @ResponseBody
+    public ServerResponse update(HttpSession session, String goodsSpecIds, Integer amount) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return cartService.update(agent.getId(), goodsSpecIds, amount);
+    }
 }
