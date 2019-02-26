@@ -6,9 +6,9 @@ import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.OrderDTO;
 import com.zjut.dropshipping.dto.OrderDetailDTO;
 import com.zjut.dropshipping.dto.OrderItemDTO;
+import com.zjut.dropshipping.dto.SpecificationDTO;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.OrderService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -111,9 +111,6 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItem orderItem:
              orderItemList) {
             orderItem.setOrderId(orderId);
-            if (orderItem.getGoodsSpecIds() == null) {
-                orderItem.setGoodsSpecIds("null");
-            }
             orderItemRepository.save(orderItem);
         }
     }
@@ -157,24 +154,25 @@ public class OrderServiceImpl implements OrderService {
                 orderItemList) {
             OrderItemDTO orderItemDTO = new OrderItemDTO();
             Goods goods = goodsRepository.findByGoodsId(orderItem.getGoodsId());
+            // 获得基本价格
+            orderItemDTO.setPrice(goods.getPrice());
             String[] goodsSpecIds = orderItem.getGoodsSpecIds().split(";");
-            List<Specification> specificationList = new ArrayList<>();
-            if (("null".equals(goodsSpecIds[0]))) {
-                specificationList = null;
-            } else {
-                for (String goodsSpecId :
-                        goodsSpecIds) {
-                    GoodsSpecItem goodsSpecItem = goodsSpecItemRepository.findByGoodsSpecId(Integer.parseInt(goodsSpecId));
-                    Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
-                    specificationList.add(specification);
-                }
+            List<SpecificationDTO> specificationDTOList = new ArrayList<>();
+            for (String goodsSpecId :
+                goodsSpecIds) {
+                GoodsSpecItem goodsSpecItem = goodsSpecItemRepository.findByGoodsSpecId(Integer.parseInt(goodsSpecId));
+                Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
+                SpecificationDTO specificationDTO = new SpecificationDTO(Integer.parseInt(goodsSpecId),
+                        specification.getName(), specification.getValue(), null);
+                specificationDTOList.add(specificationDTO);
+
+                orderItemDTO.addPrice(goodsSpecItem.getPriceDifference());
             }
 
             orderItemDTO.setGoodsId(goods.getGoodsId());
-            orderItemDTO.setSpecificationList(specificationList);
+            orderItemDTO.setSpecificationList(specificationDTOList);
             orderItemDTO.setName(goods.getName());
             orderItemDTO.setAmount(orderItem.getAmount());
-            orderItemDTO.setPrice(goods.getPrice());
 
             orderItemDTOList.add(orderItemDTO);
         }
