@@ -118,17 +118,20 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public ServerResponse getSpecification(Integer goodsId) {
         List<GoodsSpecItem> goodsSpecItemList = goodsSpecItemRepository.findByGoodsId(goodsId);
-        List<Specification> specificationList = new ArrayList<>();
+        List<SpecificationDTO> specificationDTOList = new ArrayList<>();
         if (goodsSpecItemList.size() == 0) {
             return ServerResponse.createByErrorMessage("该商品不存在或无可选规格");
         } else {
             for (GoodsSpecItem goodsSpecItem:
                     goodsSpecItemList) {
                 Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
-                specificationList.add(specification);
+                SpecificationDTO specificationDTO = new SpecificationDTO(goodsSpecItem.getGoodsSpecId(),
+                        specification.getName(), specification.getValue(),
+                        goodsSpecItem.getPriceDifference());
+                specificationDTOList.add(specificationDTO);
             }
         }
-        return ServerResponse.createBySuccess(specificationList);
+        return ServerResponse.createBySuccess(specificationDTOList);
     }
 
     private List<GoodsEvaluationDTO> getEvaluationList(List<GoodsEvaluation> goodsEvaluationList) {
