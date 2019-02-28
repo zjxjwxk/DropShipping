@@ -5,6 +5,7 @@ import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.OrderItem;
+import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -56,4 +57,17 @@ public class OrderController {
 
         return orderService.getOrderDetail(orderId);
     }
+
+    @GetMapping("/producer_get_order_list")
+    @ResponseBody
+    public ServerResponse producerGetOrderList(HttpSession session) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.producerGetOrderList(producer.getId());
+    }
+
+
+
 }
