@@ -34,6 +34,11 @@ public class Agent {
     public Agent() {
     }
 
+    public Agent(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Agent(String name, String phone, String password, String identityNumber, String region, String state, String externalShop) {
         this.name = name;
         this.phone = phone;

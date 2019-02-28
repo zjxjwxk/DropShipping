@@ -17,5 +17,7 @@ public interface OrderService {
 
     ServerResponse agentGetOrderList(Integer agentId);
 
+    ServerResponse producerGetOrderList(Integer producerId);
+
     ServerResponse getOrderDetail(Integer orderId);
 }

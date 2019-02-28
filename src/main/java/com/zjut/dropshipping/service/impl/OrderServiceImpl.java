@@ -6,6 +6,7 @@ import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.OrderDTO;
 import com.zjut.dropshipping.dto.OrderDetailDTO;
 import com.zjut.dropshipping.dto.OrderItemDTO;
+import com.zjut.dropshipping.dto.ProducerOrderDTO;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.OrderService;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final SpecificationRepository specificationRepository;
     private final GoodsSpecItemRepository goodsSpecItemRepository;
-
+    private final AgentRepository agentRepository;
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             BuyerRepository buyerRepository,
@@ -38,7 +39,8 @@ public class OrderServiceImpl implements OrderService {
                             LogisticRepository logisticRepository,
                             OrderItemRepository orderItemRepository,
                             SpecificationRepository specificationRepository,
-                            GoodsSpecItemRepository goodsSpecItemRepository) {
+                            GoodsSpecItemRepository goodsSpecItemRepository,
+                            AgentRepository agentRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
@@ -47,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
         this.orderItemRepository = orderItemRepository;
         this.specificationRepository = specificationRepository;
         this.goodsSpecItemRepository = goodsSpecItemRepository;
+        this.agentRepository = agentRepository;
     }
 
 
@@ -106,6 +109,17 @@ public class OrderServiceImpl implements OrderService {
         return ServerResponse.createBySuccess(this.getOrderDetailDTO(order));
     }
 
+    @Override
+    public ServerResponse producerGetOrderList(Integer producerId) {
+        List<Order> orderList = orderRepository.findByProducerId(producerId);
+        if (orderList.size() == 0) {
+            return ServerResponse.createByErrorMessage("暂无订单");
+        }
+        return ServerResponse.createBySuccess(this.producerGetOrderDTOList(orderList));
+    }
+
+
+
     private void saveOrderItemList(Integer orderId, List<OrderItem> orderItemList) {
         orderItemRepository.deleteByOrderId(orderId);
         for (OrderItem orderItem:
@@ -149,6 +163,39 @@ public class OrderServiceImpl implements OrderService {
             orderDTOList.add(orderDTO);
         }
         return orderDTOList;
+    }
+
+    private List<ProducerOrderDTO> producerGetOrderDTOList(List<Order> orderList) {
+        List<ProducerOrderDTO> producerOrderDTOList = new ArrayList<>();
+        for (Order order :
+                orderList) {
+            ProducerOrderDTO producerOrderDTO = new ProducerOrderDTO();
+
+            List<OrderItem> orderItemList = orderItemRepository.findByOrderId(order.getOrderId());
+            Buyer buyer = buyerRepository.findBuyerById(order.getBuyerId());
+            Logistic logistic = logisticRepository.findByOrderId(order.getOrderId());
+            Agent agent = agentRepository.findIdAndName(order.getAgentId());
+
+            producerOrderDTO.setOrderId(order.getOrderId());
+            producerOrderDTO.setState(order.getState());
+
+            buyer.setAddress(null);
+            producerOrderDTO.setBuyer(buyer);
+
+            producerOrderDTO.setOrderItemList(this.getOrderItemDTOList(orderItemList));
+
+            if (logistic != null) {
+                logistic.setOrderId(null);
+                logistic.setDeliveryDate(null);
+                logistic.setPrice(null);
+            }
+            producerOrderDTO.setLogistic(logistic);
+
+            producerOrderDTO.setAgent(agent);
+
+            producerOrderDTOList.add(producerOrderDTO);
+        }
+        return producerOrderDTOList;
     }
 
     private List<OrderItemDTO> getOrderItemDTOList(List<OrderItem> orderItemList) {

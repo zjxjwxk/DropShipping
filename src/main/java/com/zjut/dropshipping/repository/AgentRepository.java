@@ -27,5 +27,7 @@ public interface AgentRepository extends JpaRepository<Agent, Integer> {
     @Query(value="select * from agent where id in (select agent_id from agreement where producer_id =?1 and state='正常') and state='正常' ", nativeQuery = true)
     Page<Agent> findAcceptedAgentByProducerId(Integer producerId, Pageable pageable);
 
+    @Query("select new Agent(agent.id, agent.name) from Agent agent where id = ?1")
+    Agent findIdAndName(Integer id);
 
 }
