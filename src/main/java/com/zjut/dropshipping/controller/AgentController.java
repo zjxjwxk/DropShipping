@@ -6,6 +6,8 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.service.AgentService;
 import com.zjut.dropshipping.service.FileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/agent")
 public class AgentController {
 
+    private Logger logger = LoggerFactory.getLogger(AgentController.class);
     private final AgentService agentService;
     private final FileService fileService;
 
@@ -50,7 +53,6 @@ public class AgentController {
         if (response.isSuccess()) {
             session.setAttribute(Const.CURRENT_AGENT, response.getData());
         }
-
         return response;
     }
 
@@ -101,6 +103,16 @@ public class AgentController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
         return agentService.responseProducerAgreementRequest(agent.getId(), producerId, response);
+    }
+
+    @PostMapping("/cancel_agreement")
+    @ResponseBody
+    public ServerResponse cancelAgreement(HttpSession session, Integer producerId) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return agentService.cancelAgreement(agent.getId(), producerId);
     }
 
     @GetMapping("/get_recommend_producer")

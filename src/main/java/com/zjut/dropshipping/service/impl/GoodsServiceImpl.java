@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -56,19 +55,22 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public ServerResponse getList(String keyword, Integer categoryId, Integer agreementAgentId, Integer pageNum, Integer pageSize,
+    public ServerResponse getList(String keyword, Integer categoryId, Integer producerId,
+                                  Integer agreementAgentId, Integer pageNum, Integer pageSize,
                                   String orderBy) {
         List<Integer> categoryIdList = categoryService.getCategoryAndChildrenIdListByParentId(categoryId);
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
         Page<Goods> goodsPage;
-        if (agreementAgentId != null) {
+        if (producerId != null) {
+            goodsPage = goodsRepository.findByProducerIdAndCategoryIdIn(producerId, categoryIdList, pageable);
+        } else if (agreementAgentId != null) {
             List<Integer> producerIdList = agreementRepository.findProducerIdListByAgentIdAndState(agreementAgentId, Const.AgreementState.NORMAL);
             goodsPage = goodsRepository.findByProducerIdInAndCategoryIdIn(producerIdList, categoryIdList, pageable);
         } else {
             goodsPage = goodsRepository.findByCategoryIdIn(categoryIdList, pageable);
         }
 
-        return ServerResponse.createBySuccess(this.getPageChunk(goodsPage, agreementAgentId));
+        return ServerResponse.createBySuccess(this.getPageChunk(goodsPage));
     }
 
     @Override
@@ -116,17 +118,20 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public ServerResponse getSpecification(Integer goodsId) {
         List<GoodsSpecItem> goodsSpecItemList = goodsSpecItemRepository.findByGoodsId(goodsId);
-        List<Specification> specificationList = new ArrayList<>();
+        List<SpecificationDTO> specificationDTOList = new ArrayList<>();
         if (goodsSpecItemList.size() == 0) {
-            return ServerResponse.createByErrorMessage("该商品不存在或无可选规格");
+            return ServerResponse.createByErrorMessage("该商品不存在");
         } else {
             for (GoodsSpecItem goodsSpecItem:
                     goodsSpecItemList) {
                 Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
-                specificationList.add(specification);
+                SpecificationDTO specificationDTO = new SpecificationDTO(goodsSpecItem.getGoodsSpecId(),
+                        specification.getName(), specification.getValue(),
+                        goodsSpecItem.getPriceDifference());
+                specificationDTOList.add(specificationDTO);
             }
         }
-        return ServerResponse.createBySuccess(specificationList);
+        return ServerResponse.createBySuccess(specificationDTOList);
     }
 
     private List<GoodsEvaluationDTO> getEvaluationList(List<GoodsEvaluation> goodsEvaluationList) {
@@ -146,9 +151,9 @@ public class GoodsServiceImpl implements GoodsService {
         return goodsEvaluationDTOList;
     }
 
-    private PageChunk<GoodsListDTO> getPageChunk(Page<Goods> goodsPage, Integer agreementAgentId) {
+    private PageChunk<GoodsListDTO> getPageChunk(Page<Goods> goodsPage) {
         PageChunk<GoodsListDTO> pageChunk = new PageChunk<>();
-        pageChunk.setContent(this.getGoodsListDTOList(goodsPage.getContent(), agreementAgentId));
+        pageChunk.setContent(this.getGoodsListDTOList(goodsPage.getContent()));
         pageChunk.setTotalPages(goodsPage.getTotalPages());
         pageChunk.setTotalElements(goodsPage.getTotalElements());
         pageChunk.setPageNumber(goodsPage.getPageable().getPageNumber() + 1);
@@ -156,7 +161,7 @@ public class GoodsServiceImpl implements GoodsService {
         return pageChunk;
     }
 
-    private List<GoodsListDTO> getGoodsListDTOList(List<Goods> goodsList, Integer agreementAgentId) {
+    private List<GoodsListDTO> getGoodsListDTOList(List<Goods> goodsList) {
         List<GoodsListDTO> goodsListDTOList = new ArrayList<>();
         for (Goods goods :
                 goodsList) {
@@ -164,11 +169,9 @@ public class GoodsServiceImpl implements GoodsService {
             goodsListDTO.setGoodsId(goods.getGoodsId());
             goodsListDTO.setName(goods.getName());
             goodsListDTO.setPrice(goods.getPrice());
-            if (agreementAgentId != null) {
-                Producer producer = producerRepository.findOneById(goods.getProducerId());
-                goodsListDTO.setProducerId(producer.getId());
-                goodsListDTO.setProducerName(producer.getName());
-            }
+            Producer producer = producerRepository.findOneById(goods.getProducerId());
+            goodsListDTO.setProducerId(producer.getId());
+            goodsListDTO.setProducerName(producer.getName());
             goodsListDTOList.add(goodsListDTO);
         }
         return goodsListDTOList;
