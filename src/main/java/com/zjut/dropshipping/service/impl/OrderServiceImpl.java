@@ -243,4 +243,21 @@ public class OrderServiceImpl implements OrderService {
 
         return orderDetailDTO;
     }
+
+    @Override
+    public ServerResponse orderStateReceive(Integer orderId){
+        Order order = orderRepository.findOneByOrderId(orderId);
+        order.setState(Const.OrderState.TO_BE_RECEIVED);
+        orderRepository.save(order);
+        return  ServerResponse.createBySuccess("接受");
+    }
+
+    @Override
+    public ServerResponse orderStateReject(Integer orderId){
+        Order order = orderRepository.findOneByOrderId(orderId);
+        order.setState(Const.OrderState.REJECTED);
+        orderRepository.save(order);
+        return  ServerResponse.createBySuccess("驳回");
+    }
+
 }

@@ -127,7 +127,6 @@ public class ProducerController {
                                    Integer categoryId,
                                    Double price,
                                    Integer stock,
-
                                    String content
                                                         ) {
         Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
