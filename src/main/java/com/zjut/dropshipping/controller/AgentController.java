@@ -6,8 +6,6 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.service.AgentService;
 import com.zjut.dropshipping.service.FileService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +20,6 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/agent")
 public class AgentController {
 
-    private Logger logger = LoggerFactory.getLogger(AgentController.class);
     private final AgentService agentService;
     private final FileService fileService;
 
@@ -32,9 +29,6 @@ public class AgentController {
         this.fileService = fileService;
     }
 
-
-
-
     @PostMapping("/register")
     @ResponseBody
     public ServerResponse register(Agent agent, HttpSession session) {
@@ -42,7 +36,6 @@ public class AgentController {
         if (response.isSuccess()) {
             session.setAttribute(Const.CURRENT_AGENT, agent);
         }
-
         return response;
     }
 
@@ -127,6 +120,4 @@ public class AgentController {
         }
         return agentService.getRecommendProducer( pageNumber, numberOfElements);
     }
-
-
 }

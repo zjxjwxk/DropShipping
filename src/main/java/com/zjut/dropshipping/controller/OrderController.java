@@ -8,14 +8,11 @@ import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.OrderItem;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.OrderService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author zjxjwxk
@@ -24,7 +21,6 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
-    private Logger logger = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
 
     @Autowired
