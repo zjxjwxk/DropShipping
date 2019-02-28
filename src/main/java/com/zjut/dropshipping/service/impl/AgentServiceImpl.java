@@ -152,6 +152,15 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    public ServerResponse cancelAgreement(Integer agentId, Integer producerId) {
+        Agreement agreement = agreementRepository.findByAgentIdAndProducerIdAndState(agentId, producerId, Const.AgreementState.NORMAL);
+        if (agreement == null) {
+            return ServerResponse.createByErrorMessage("该协议不存在");
+        }
+        return ServerResponse.createBySuccess("取消协议成功");
+    }
+
+    @Override
     public ServerResponse getRecommendProducer(Integer pageNumber, Integer numberOfElements){
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, numberOfElements);
         Page<Producer> producerPage = producerRepository.findAllByState(Const.AccountState.NORMAL,pageRequest);

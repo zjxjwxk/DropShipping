@@ -103,6 +103,16 @@ public class AgentController {
         return agentService.responseProducerAgreementRequest(agent.getId(), producerId, response);
     }
 
+    @PostMapping("/cancel_agreement")
+    @ResponseBody
+    public ServerResponse cancelAgreement(HttpSession session, Integer producerId) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return agentService.cancelAgreement(agent.getId(), producerId);
+    }
+
     @GetMapping("/get_recommend_producer")
     @ResponseBody
     public ServerResponse getRecommendProducer(HttpSession session,

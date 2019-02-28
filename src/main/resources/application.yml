@@ -1,8 +1,8 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    username: smart
-    password: sjl123456
+    username: zjxjwxk
+    password: 19981018
     url: jdbc:mysql://39.108.183.2/smart?characterEncoding=utf-8&useSSL=false&&serverTimezone=GMT%2b8&zeroDateTimeBehavior=convertToNull
   jpa:
     show-sql: true
@@ -12,3 +12,7 @@ spring:
       max-request-size: 2048MB
   jackson:
     time-zone: GMT+8
+server:
+  servlet:
+    session:
+      timeout: -1

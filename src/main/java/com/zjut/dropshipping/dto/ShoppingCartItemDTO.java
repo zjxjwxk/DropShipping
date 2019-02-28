@@ -1,5 +1,6 @@
 package com.zjut.dropshipping.dto;
 
+import com.zjut.dropshipping.dataobject.Specification;
 import lombok.Data;
 
 import java.util.List;
@@ -8,13 +9,15 @@ import java.util.List;
  * @author zjxjwxk
  */
 @Data
-public class OrderItemDTO {
+public class ShoppingCartItemDTO {
 
     private Integer goodsId;
-    private String name;
-    private List<SpecificationDTO> specificationList;
-    private Integer amount;
+    private String goodsName;
+
+    private List<SpecificationDTO> specificationDTOList;
+
     private Double price;
+    private Integer amount;
 
     public void addPrice(Double priceDifference) {
         price += priceDifference;

@@ -28,6 +28,7 @@ public class GoodsController {
     @ResponseBody
     public ServerResponse getList(@RequestParam(value = "keyword", required = false) String keyword,
                                   @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId,
+                                  @RequestParam(value = "producerId", required = false) Integer producerId,
                                   @RequestParam(value = "inAgreement", defaultValue = "false") Boolean inAgreement,
                                   @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
@@ -38,9 +39,9 @@ public class GoodsController {
             if (agent == null) {
                 return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
             }
-            return goodsService.getList(keyword, categoryId, agent.getId(), pageNum, pageSize, orderBy);
+            return goodsService.getList(keyword, categoryId, producerId, agent.getId(), pageNum, pageSize, orderBy);
         }
-        return goodsService.getList(keyword, categoryId, null, pageNum, pageSize, orderBy);
+        return goodsService.getList(keyword, categoryId, producerId, null, pageNum, pageSize, orderBy);
     }
 
     @GetMapping("/get_detail")
