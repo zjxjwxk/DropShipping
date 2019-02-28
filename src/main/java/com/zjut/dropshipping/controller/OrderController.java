@@ -1,5 +1,6 @@
 package com.zjut.dropshipping.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,27 +36,34 @@ public class OrderController {
     @ResponseBody
     public ServerResponse agentAddOrder(HttpSession session,
                                         @RequestParam(required = false) Integer orderId,
-                                        @RequestBody OrderItem[] orderItemList,
+                                        String orderItemList,
                                         String remark, String buyerName,
                                         String buyerPhone, String address) {
         Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-
-        logger.info("orderId : " + orderId);
-        logger.info("orderItemList length: " + orderItemList.length) ;
-        logger.info("orderItemList -------------" );
-        for (OrderItem orderItem :
-                orderItemList) {
-            logger.info(orderItem.toString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        OrderItem[] orderItems;
+        try {
+            orderItems = objectMapper.readValue(orderItemList, OrderItem[].class);
+            logger.info("orderId : " + orderId);
+            logger.info("orderItemList length: " + orderItemList.length()) ;
+            logger.info("orderItemList -------------" );
+            for (OrderItem orderItem :
+                    orderItems) {
+                logger.info(orderItem.toString());
+            }
+            logger.info("-------------------");
+            logger.info("remark : " + remark);
+            logger.info("buyerName : " + buyerName);
+            logger.info("buyerPhone : " + buyerPhone);
+            logger.info("address : " + address);
+            return orderService.agentSaveOrder(orderId, agent.getId(), orderItems, remark, buyerName, buyerPhone, address);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        logger.info("-------------------");
-        logger.info("remark : " + remark);
-        logger.info("buyerName : " + buyerName);
-        logger.info("buyerPhone : " + buyerPhone);
-        logger.info("address : " + address);
-        return orderService.agentSaveOrder(orderId, agent.getId(), orderItemList, remark, buyerName, buyerPhone, address);
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
     }
 
     @GetMapping("/agent_get_order_list")
