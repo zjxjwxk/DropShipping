@@ -11,7 +11,7 @@ import java.util.List;
 public interface OrderService {
 
     ServerResponse agentSaveOrder(Integer orderId, Integer agentId,
-                                  List<OrderItem> orderItemList,
+                                  OrderItem[] orderItemList,
                                   String remark, String buyerName,
                                   String buyerPhone, String address);
 

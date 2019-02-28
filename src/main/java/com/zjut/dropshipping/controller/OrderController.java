@@ -31,7 +31,7 @@ public class OrderController {
     @ResponseBody
     public ServerResponse agentAddOrder(HttpSession session,
                                         @RequestParam(required = false) Integer orderId,
-                                        @RequestBody List<OrderItem> orderItemList,
+                                        @RequestBody OrderItem[] orderItemList,
                                         String remark, String buyerName,
                                         String buyerPhone, String address) {
         Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
