@@ -47,18 +47,6 @@ public class OrderController {
         OrderItem[] orderItems;
         try {
             orderItems = objectMapper.readValue(orderItemList, OrderItem[].class);
-            logger.info("orderId : " + orderId);
-            logger.info("orderItemList length: " + orderItemList.length()) ;
-            logger.info("orderItemList -------------" );
-            for (OrderItem orderItem :
-                    orderItems) {
-                logger.info(orderItem.toString());
-            }
-            logger.info("-------------------");
-            logger.info("remark : " + remark);
-            logger.info("buyerName : " + buyerName);
-            logger.info("buyerPhone : " + buyerPhone);
-            logger.info("address : " + address);
             return orderService.agentSaveOrder(orderId, agent.getId(), orderItems, remark, buyerName, buyerPhone, address);
         } catch (IOException e) {
             e.printStackTrace();

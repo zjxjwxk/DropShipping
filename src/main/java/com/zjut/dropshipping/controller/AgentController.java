@@ -48,12 +48,11 @@ public class AgentController {
 
     @PostMapping("/login")
     @ResponseBody
-    public ServerResponse<Agent> login(String phone, String password, String test, HttpSession session) {
+    public ServerResponse<Agent> login(String phone, String password, HttpSession session) {
         ServerResponse<Agent> response = agentService.login(phone, password);
         if (response.isSuccess()) {
             session.setAttribute(Const.CURRENT_AGENT, response.getData());
         }
-        logger.info(test);
         return response;
     }
 
