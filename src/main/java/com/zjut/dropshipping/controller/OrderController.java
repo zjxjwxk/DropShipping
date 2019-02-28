@@ -77,6 +77,24 @@ public class OrderController {
         return orderService.producerGetOrderList(producer.getId());
     }
 
+    @PostMapping("/order_state_receive")
+    @ResponseBody
+    public ServerResponse orderStateReceive(HttpSession session,Integer orderId) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.orderStateReceive(orderId);
+    }
 
+    @PostMapping("/order_state_reject")
+    @ResponseBody
+    public ServerResponse orderStateReject(HttpSession session,Integer orderId) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.orderStateReject(orderId);
+    }
 
 }
