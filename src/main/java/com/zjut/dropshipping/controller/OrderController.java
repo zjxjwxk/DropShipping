@@ -7,7 +7,6 @@ import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.OrderItem;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.OrderService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
