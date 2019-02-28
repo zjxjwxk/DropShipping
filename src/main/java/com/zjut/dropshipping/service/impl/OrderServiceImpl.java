@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ServerResponse agentSaveOrder(Integer orderId, Integer agentId,
-                                         List<OrderItem> orderItemList,
+                                         OrderItem[] orderItemList,
                                          String remark, String buyerName,
                                          String buyerPhone, String address) {
         Buyer buyer = buyerRepository.findByNameAndPhoneAndAddress(buyerName, buyerPhone, address);
@@ -81,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAgentId(agentId);
 
         order.setBuyerId(buyer.getId());
-        order.setProducerId(goodsRepository.findByGoodsId(orderItemList.get(0).getGoodsId()).getProducerId());
+        order.setProducerId(goodsRepository.findByGoodsId(orderItemList[0].getGoodsId()).getProducerId());
         order.setState(Const.OrderState.TO_BE_CONFIRMED);
         order.setRemark(remark);
 
@@ -120,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-    private void saveOrderItemList(Integer orderId, List<OrderItem> orderItemList) {
+    private void saveOrderItemList(Integer orderId, OrderItem[] orderItemList) {
         orderItemRepository.deleteByOrderId(orderId);
         for (OrderItem orderItem:
              orderItemList) {
