@@ -1,6 +1,7 @@
 package com.zjut.dropshipping.service.impl;
 
 import com.zjut.dropshipping.common.Const;
+import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.OrderDTO;
@@ -31,6 +32,8 @@ public class OrderServiceImpl implements OrderService {
     private final SpecificationRepository specificationRepository;
     private final GoodsSpecItemRepository goodsSpecItemRepository;
     private final AgentRepository agentRepository;
+    private final RefundStatusRepository refundStatusRepository;
+
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             BuyerRepository buyerRepository,
@@ -40,7 +43,8 @@ public class OrderServiceImpl implements OrderService {
                             OrderItemRepository orderItemRepository,
                             SpecificationRepository specificationRepository,
                             GoodsSpecItemRepository goodsSpecItemRepository,
-                            AgentRepository agentRepository) {
+                            AgentRepository agentRepository,
+                            RefundStatusRepository refundStatusRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
@@ -50,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
         this.specificationRepository = specificationRepository;
         this.goodsSpecItemRepository = goodsSpecItemRepository;
         this.agentRepository = agentRepository;
+        this.refundStatusRepository = refundStatusRepository;
     }
 
 
@@ -118,7 +123,35 @@ public class OrderServiceImpl implements OrderService {
         return ServerResponse.createBySuccess(this.producerGetOrderDTOList(orderList));
     }
 
-
+    @Override
+    public ServerResponse agentModifyOrderState(Integer agent, Integer orderId, String type) {
+        Order order = orderRepository.findOneByOrderId(orderId);
+        // 取消订单
+        if (Const.OrderModifyType.CANCEL.equals(type)) {
+            if (Const.OrderState.TO_BE_CONFIRMED.equals(order.getState())) {
+                order.setState("退款");
+                RefundStatus refundStatus = new RefundStatus(orderId, Const.RefundStatus.REFUNDING);
+                refundStatusRepository.save(refundStatus);
+            }
+        // 退款
+        } else if (Const.OrderModifyType.REFUND.equals(type)) {
+            if (Const.OrderState.TO_BE_RECEIVED.equals(order.getState())) {
+                order.setState("退款");
+                RefundStatus refundStatus = new RefundStatus(orderId, Const.RefundStatus.REFUNDING);
+                refundStatusRepository.save(refundStatus);
+            }
+        // 退货
+        } else if (Const.OrderModifyType.RETURN.equals(type)) {
+            if (Const.OrderState.COMPLETED.equals(order.getState())) {
+                order.setState("退款");
+                RefundStatus refundStatus = new RefundStatus(orderId, Const.RefundStatus.REFUNDING);
+                refundStatusRepository.save(refundStatus);
+            }
+        } else {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        return ServerResponse.createBySuccess("修改订单状态成功");
+    }
 
     private void saveOrderItemList(Integer orderId, OrderItem[] orderItemList) {
         orderItemRepository.deleteByOrderId(orderId);
