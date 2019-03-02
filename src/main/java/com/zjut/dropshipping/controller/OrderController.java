@@ -97,4 +97,13 @@ public class OrderController {
         return orderService.orderStateReject(orderId);
     }
 
+    @PostMapping("/agent_modify_order_state")
+    @ResponseBody
+    public ServerResponse agentModifyOrderState(HttpSession session, Integer orderId, String type) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.agentModifyOrderState(agent.getId(), orderId, type);
+    }
 }
