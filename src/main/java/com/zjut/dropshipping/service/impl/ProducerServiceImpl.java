@@ -3,10 +3,7 @@ package com.zjut.dropshipping.service.impl;
 import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
-import com.zjut.dropshipping.dataobject.Agent;
-import com.zjut.dropshipping.dataobject.Agreement;
-import com.zjut.dropshipping.dataobject.Producer;
-import com.zjut.dropshipping.dataobject.Goods;
+import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.*;
 
@@ -33,6 +30,7 @@ public class ProducerServiceImpl implements ProducerService {
     private final AgreementRepository agreementRepository;
     private final CategoryRepository categoryRepository;
     private final GoodsRepository goodsRepository;
+    private final GoodsSpecItemRepository goodsSpecItemRepository;
     @Autowired
     public ProducerServiceImpl(ProducerRepository producerRepository,
                                AgentRepository agentRepository,
@@ -40,7 +38,8 @@ public class ProducerServiceImpl implements ProducerService {
                                EvaluationRepository evaluationRepository,
                                AgreementRepository agreementRepository,
                                CategoryRepository categoryRepository,
-                               GoodsRepository goodsRepository) {
+                               GoodsRepository goodsRepository,
+                               GoodsSpecItemRepository goodsSpecItemRepository) {
         this.producerRepository = producerRepository;
         this.agentRepository = agentRepository;
         this.orderRepository = orderRepository;
@@ -48,6 +47,7 @@ public class ProducerServiceImpl implements ProducerService {
         this.agreementRepository = agreementRepository;
         this.categoryRepository = categoryRepository;
         this.goodsRepository = goodsRepository;
+        this.goodsSpecItemRepository = goodsSpecItemRepository;
     }
 
     @Override
@@ -304,6 +304,7 @@ public class ProducerServiceImpl implements ProducerService {
                                    Integer stock,
                                    String content) {
 
+
                 Goods goods = new Goods();
                 goods.setProducerId(producerId);
                 goods.setCategoryId(categoryId);
@@ -312,9 +313,17 @@ public class ProducerServiceImpl implements ProducerService {
                 goods.setStock(stock);
                 goods.setState("正常");
                 goods.setContent(content);
-                goodsRepository.save(goods);
+                Goods returnGoods = goodsRepository.save(goods);
+
+                GoodsSpecItem goodsSpecItem = new GoodsSpecItem();
+                goodsSpecItem.setGoodsId(returnGoods.getGoodsId());
+                goodsSpecItem.setPriceDifference(0.0);
+                goodsSpecItem.setSpecId(0);
+                goodsSpecItemRepository.save(goodsSpecItem);
 
                 return ServerResponse.createBySuccess("商品添加成功");
 
     }
+
+
 }
