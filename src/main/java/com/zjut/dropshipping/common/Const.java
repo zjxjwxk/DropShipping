@@ -49,6 +49,26 @@ public class Const {
         String REJECTED = "驳回";
     }
 
+    public interface OrderModifyType {
+
+        String CANCEL = "cancel";
+
+        String REFUND = "refund";
+
+        String RETURN = "return";
+    }
+
+    public interface RefundStatus {
+
+        String REJECTED = "驳回";
+
+        String REFUNDING = "退款中";
+
+        String REFUND_SUCCESS = "退款成功";
+
+        String REFUND_FAILED = "退款失败";
+    }
+
     public interface AgreementResponse {
 
         String ACCEPT = "accept";

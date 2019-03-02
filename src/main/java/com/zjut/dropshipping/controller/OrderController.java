@@ -8,14 +8,11 @@ import com.zjut.dropshipping.dataobject.Agent;
 import com.zjut.dropshipping.dataobject.OrderItem;
 import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.OrderService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author zjxjwxk
@@ -24,7 +21,6 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
-    private Logger logger = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
 
     @Autowired
@@ -101,4 +97,13 @@ public class OrderController {
         return orderService.orderStateReject(orderId);
     }
 
+    @PostMapping("/agent_modify_order_state")
+    @ResponseBody
+    public ServerResponse agentModifyOrderState(HttpSession session, Integer orderId, String type) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.agentModifyOrderState(agent.getId(), orderId, type);
+    }
 }

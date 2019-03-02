@@ -24,4 +24,6 @@ public interface OrderService {
     ServerResponse orderStateReceive(Integer orderId);
 
     ServerResponse orderStateReject(Integer orderId);
+
+    ServerResponse agentModifyOrderState(Integer agentId, Integer orderId, String type);
 }
