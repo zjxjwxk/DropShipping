@@ -51,6 +51,8 @@ public class Const {
 
     public interface OrderModifyType {
 
+        String COMPLETED = "completed";
+
         String CANCEL = "cancel";
 
         String REFUND = "refund";

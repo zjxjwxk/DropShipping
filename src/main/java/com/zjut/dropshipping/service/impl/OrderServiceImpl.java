@@ -126,26 +126,40 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ServerResponse agentModifyOrderState(Integer agent, Integer orderId, String type) {
         Order order = orderRepository.findOneByOrderId(orderId);
+        // 确认收货
+        if (Const.OrderModifyType.COMPLETED.equals(type)) {
+            if (Const.OrderState.TO_BE_RECEIVED.equals(order.getState())) {
+                order.setState(Const.OrderState.COMPLETED);
+                orderRepository.save(order);
+            } else {
+                return ServerResponse.createByErrorMessage("该订单不处于待收货状态，确认收货失败");
+            }
         // 取消订单
-        if (Const.OrderModifyType.CANCEL.equals(type)) {
+        } else if (Const.OrderModifyType.CANCEL.equals(type)) {
             if (Const.OrderState.TO_BE_CONFIRMED.equals(order.getState())) {
-                order.setState("退款");
+                order.setState(Const.OrderState.REFUND);
                 RefundStatus refundStatus = new RefundStatus(orderId, Const.RefundStatus.REFUNDING);
                 refundStatusRepository.save(refundStatus);
+            } else {
+                return ServerResponse.createByErrorMessage("该订单不处于待确认状态，取消订单失败");
             }
         // 退款
         } else if (Const.OrderModifyType.REFUND.equals(type)) {
             if (Const.OrderState.TO_BE_RECEIVED.equals(order.getState())) {
-                order.setState("退款");
+                order.setState(Const.OrderState.REFUND);
                 RefundStatus refundStatus = new RefundStatus(orderId, Const.RefundStatus.REFUNDING);
                 refundStatusRepository.save(refundStatus);
+            } else {
+                return ServerResponse.createByErrorMessage("该订单不处于待收货状态，退款失败");
             }
         // 退货
         } else if (Const.OrderModifyType.RETURN.equals(type)) {
             if (Const.OrderState.COMPLETED.equals(order.getState())) {
-                order.setState("退款");
+                order.setState(Const.OrderState.REFUND);
                 RefundStatus refundStatus = new RefundStatus(orderId, Const.RefundStatus.REFUNDING);
                 refundStatusRepository.save(refundStatus);
+            } else {
+                return ServerResponse.createByErrorMessage("该订单不处于已完成状态，退货失败");
             }
         } else {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
