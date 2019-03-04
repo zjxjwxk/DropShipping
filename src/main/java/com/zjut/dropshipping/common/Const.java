@@ -51,6 +51,8 @@ public class Const {
 
     public interface OrderModifyType {
 
+        String COMPLETED = "completed";
+
         String CANCEL = "cancel";
 
         String REFUND = "refund";
@@ -83,6 +85,8 @@ public class Const {
         String IDENTITY_CARD_1 = "IDCard-1";
 
         String IDENTITY_CARD_2 = "IDCard-2";
+
+        String GOODS = "goods";
     }
 
 }

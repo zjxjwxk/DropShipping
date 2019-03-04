@@ -9,6 +9,7 @@ import com.zjut.dropshipping.utils.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -28,21 +29,60 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public ServerResponse IDCardUpload(MultipartFile file, String path, String type, Integer id, String identityNumber) {
+        ServerResponse response = this.getFileExtensionName(file);
+        if (response.isError()) {
+            return response;
+        } else {
+            // 最终上传到服务器的文件名
+            String uploadFileName;
+            if (type.equals(Const.UploadType.IDENTITY_CARD_1)) {
+                uploadFileName = identityNumber + "-front" + "." + response.getData();
+            } else if (type.equals(Const.UploadType.IDENTITY_CARD_2)) {
+                uploadFileName = identityNumber + "-back" + "." + response.getData();
+            } else {
+                return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+            }
+            // 上传文件
+            return this.upload(file, path, Const.UploadType.IDENTITY, id, uploadFileName);
+        }
+    }
+
+    @Override
+    public ServerResponse uploadGoodsImage(MultipartFile file, String path, Integer id, Integer number) {
+        ServerResponse response = this.getFileExtensionName(file);
+        if (response.isError()) {
+            return response;
+        } else {
+            // 最终上传到服务器的文件名
+            String uploadFileName = number + "." + response.getData();
+            return this.upload(file, path, Const.UploadType.GOODS, id, uploadFileName);
+        }
+    }
+
+    private ServerResponse getFileExtensionName(MultipartFile file) {
+        if (file == null) {
+            return ServerResponse.createByErrorMessage("文件不能为空");
+        }
+        // 获取源文件名
         String fileName = file.getOriginalFilename();
+        if (fileName == null) {
+            return ServerResponse.createByErrorMessage("上传的文件名不能为空");
+        }
         // 获取扩展名
         String fileExtensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
-        // 最终上传到服务器的文件名
-        String uploadFileName;
-        if (type.equals(Const.UploadType.IDENTITY_CARD_1)) {
-            uploadFileName = identityNumber + "-front" + "." + fileExtensionName;
-        } else if (type.equals(Const.UploadType.IDENTITY_CARD_2)) {
-            uploadFileName = identityNumber + "-back" + "." + fileExtensionName;
-        } else {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        if (StringUtils.isEmpty(fileExtensionName)) {
+            return ServerResponse.createByErrorMessage("文件格式有误");
         }
+        return ServerResponse.createBySuccess(fileExtensionName);
+    }
 
-        logger.info("开始上传文件，上传文件的文件名:{}，上传的路径:{}，新文件名:{}", fileName, path, uploadFileName);
+    private ServerResponse upload(MultipartFile file, String path, String type, Integer id, String uploadFileName) {
 
+        logger.info("开始上传文件，新文件名:{}", uploadFileName);
+
+        /*
+         创建本地暂存文件夹
+         */
         File fileDir = new File(path);
         if (!fileDir.exists()) {
             fileDir.setWritable(true);
@@ -50,15 +90,19 @@ public class FileServiceImpl implements FileService {
         }
         File targetFile = new File(path, uploadFileName);
 
+        /*
+         上传文件到服务器
+         */
         try {
+            // 上传到本地暂存文件夹
             file.transferTo(targetFile);
-            // 文件已经上传成功了
 
             List<File> fileList = new ArrayList<>();
             fileList.add(targetFile);
-            FTPUtil.upload(Const.UploadType.IDENTITY, fileList, id, identityNumber);
-            // 已经上传到ftp服务器上
+            // 上传到ftp服务器上
+            FTPUtil.upload(type, fileList, id);
 
+            // 删除本地暂存文件
             targetFile.delete();
 
         } catch (IOException e) {
@@ -66,9 +110,9 @@ public class FileServiceImpl implements FileService {
             return ServerResponse.createByErrorMessage("文件上传失败");
         }
 
-        String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + uploadFileName;
+        String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + type + "/" + id + "/" + uploadFileName;
 
-        Map fileMap = new HashMap(2);
+        Map<String, String> fileMap = new HashMap<>(2);
         fileMap.put("uri", uploadFileName);
         fileMap.put("url", url);
 

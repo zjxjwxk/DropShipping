@@ -4,10 +4,13 @@ import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Producer;
+import com.zjut.dropshipping.service.FileService;
 import com.zjut.dropshipping.service.ProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -18,10 +21,13 @@ import javax.servlet.http.HttpSession;
 public class ProducerController {
 
     private final ProducerService producerService;
+    private final FileService fileService;
 
     @Autowired
-    public ProducerController(ProducerService producerService) {
+    public ProducerController(ProducerService producerService,
+                              FileService fileService) {
         this.producerService = producerService;
+        this.fileService = fileService;
     }
 
     @PostMapping("/register")
@@ -135,4 +141,15 @@ public class ProducerController {
         return producerService.addGoods(producer.getId(), goodsName, categoryId,price,stock,content);
     }
 
+    @PostMapping("upload_goods_image")
+    @ResponseBody
+    public ServerResponse uploadGoodsImage(HttpSession session, HttpServletRequest request,
+                                           MultipartFile uploadFile, Integer goodsId, Integer number) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        return fileService.uploadGoodsImage(uploadFile, path, goodsId, number);
+    }
 }

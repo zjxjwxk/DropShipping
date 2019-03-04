@@ -33,15 +33,15 @@ public class FTPUtil {
         this.pwd = pwd;
     }
 
-    public static boolean upload(String type, List<File> fileList, Integer id, String identityNumber) throws IOException {
+    public static boolean upload(String type, List<File> fileList, Integer id) throws IOException {
         FTPUtil ftpUtil = new FTPUtil(ftpIP, 21, ftpUser, ftpPass);
         logger.info("开始连接ftp服务器");
-        boolean result = ftpUtil.uploadFile(type, fileList, id, identityNumber);
-        logger.info("开始连接ftp服务器，结束上传，上传结果:{}", result);
+        boolean result = ftpUtil.uploadFile(type, fileList, id);
+        logger.info("结束上传，上传结果:{}", result);
         return result;
     }
 
-    private boolean uploadFile(String type, List<File> fileList, Integer id, String identityNumber) throws IOException {
+    private boolean uploadFile(String type, List<File> fileList, Integer id) throws IOException {
         boolean uploaded = false;
         FileInputStream fis = null;
         // 连接FTP服务器
