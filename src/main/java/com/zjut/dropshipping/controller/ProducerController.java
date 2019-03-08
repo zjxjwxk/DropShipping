@@ -152,4 +152,17 @@ public class ProducerController {
         String path = request.getSession().getServletContext().getRealPath("upload");
         return fileService.uploadGoodsImage(uploadFile, path, goodsId, number);
     }
+
+    @GetMapping("get_sale_analysis")
+    @ResponseBody
+    public ServerResponse uploadGoodsImage(HttpSession session,
+                                           String time,
+                                           String form) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.getSaleAnalysis(producer.getId(), time,form);
+    }
+
 }

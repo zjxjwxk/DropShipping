@@ -31,6 +31,7 @@ public class ProducerServiceImpl implements ProducerService {
     private final CategoryRepository categoryRepository;
     private final GoodsRepository goodsRepository;
     private final GoodsSpecItemRepository goodsSpecItemRepository;
+    private final OrderItemRepository orderItemRepository;
     @Autowired
     public ProducerServiceImpl(ProducerRepository producerRepository,
                                AgentRepository agentRepository,
@@ -39,7 +40,8 @@ public class ProducerServiceImpl implements ProducerService {
                                AgreementRepository agreementRepository,
                                CategoryRepository categoryRepository,
                                GoodsRepository goodsRepository,
-                               GoodsSpecItemRepository goodsSpecItemRepository) {
+                               GoodsSpecItemRepository goodsSpecItemRepository,
+                               OrderItemRepository orderItemRepository) {
         this.producerRepository = producerRepository;
         this.agentRepository = agentRepository;
         this.orderRepository = orderRepository;
@@ -48,6 +50,7 @@ public class ProducerServiceImpl implements ProducerService {
         this.categoryRepository = categoryRepository;
         this.goodsRepository = goodsRepository;
         this.goodsSpecItemRepository = goodsSpecItemRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @Override
@@ -324,6 +327,115 @@ public class ProducerServiceImpl implements ProducerService {
                 return ServerResponse.createBySuccess("商品添加成功");
 
     }
+
+    @Override
+    public  ServerResponse getSaleAnalysis(Integer producerId,String time, String form){
+
+
+        if(time.equals("年")){
+            String timeYear[] = {"1-2月","3-4月","5-6月","7-8月","9-10月","11-12月"};
+            int time_Year[]={0,1,2,3,4,5};
+            if(form.equals("金额")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Year){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeYear[timeGet]);
+                    saleAnalysisDTO.setY(orderItemRepository.getProducerSaleByMonth(producerId,12-timeGet*2, 10-timeGet*2));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else if(form.equals("商品数量")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Year){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeYear[timeGet]);
+                    saleAnalysisDTO.setY(orderItemRepository.getProducerSaleAmountByMonth(producerId,12-timeGet*2, 10-timeGet*2));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else if(form.equals("订单数量")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Year){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeYear[timeGet]);
+                    saleAnalysisDTO.setY(orderRepository.getProducerOrderAmountByMonth(producerId,12-timeGet*2, 10-timeGet*2));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else {
+                return ServerResponse.createByErrorMessage("未知错误");
+            }
+        }else if(time.equals("月")){
+            String timeMonth[] = {"第一周","第二周","第三周","第四周"};
+            int time_Month[]={0,1,2,3};
+            if(form.equals("金额")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Month){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeMonth[timeGet]);
+                    saleAnalysisDTO.setY(orderItemRepository.getProducerSaleByDay(producerId,(4-timeGet)*7, (4-timeGet)*7-6));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else if(form.equals("商品数量")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Month){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeMonth[timeGet]);
+                    saleAnalysisDTO.setY(orderItemRepository.getProducerSaleAmountByDay(producerId,(4-timeGet)*7, (4-timeGet)*7-6));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else if(form.equals("订单数量")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Month){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeMonth[timeGet]);
+                    saleAnalysisDTO.setY(orderRepository.getProducerOrderAmountByDay(producerId,(4-timeGet)*7, (4-timeGet)*7-6));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else {
+                return ServerResponse.createByErrorMessage("未知错误");
+            }
+        }else if(time.equals("周")){
+            String timeWeek[] = {"周一","周二","周三","周四","周五","周六","周日"};
+            int time_Week[]={0,1,2,3,4,5,6};
+            if(form.equals("金额")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Week){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeWeek[timeGet]);
+                    saleAnalysisDTO.setY(orderItemRepository.getProducerSaleByDay(producerId,7-timeGet, 6-timeGet));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else if(form.equals("商品数量")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Week){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeWeek[timeGet]);
+                    saleAnalysisDTO.setY(orderItemRepository.getProducerSaleAmountByDay(producerId,7-timeGet, 6-timeGet));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else if(form.equals("订单数量")){
+                List<SaleAnalysisDTO> saleAnalysisDTOList = new ArrayList<>();
+                for (int timeGet:time_Week){
+                    SaleAnalysisDTO saleAnalysisDTO=new SaleAnalysisDTO();
+                    saleAnalysisDTO.setX(timeWeek[timeGet]);
+                    saleAnalysisDTO.setY(orderRepository.getProducerOrderAmountByDay(producerId,7-timeGet, 6-timeGet));
+                    saleAnalysisDTOList.add(saleAnalysisDTO);
+                }
+                return ServerResponse.createBySuccess(saleAnalysisDTOList);
+            }else {
+                return ServerResponse.createByErrorMessage("未知错误");
+            }
+        }else{
+            return ServerResponse.createByErrorMessage("未知错误");
+        }
+    }
+
 
 
 }
