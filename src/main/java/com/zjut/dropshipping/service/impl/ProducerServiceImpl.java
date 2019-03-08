@@ -324,7 +324,7 @@ public class ProducerServiceImpl implements ProducerService {
                 goodsSpecItem.setSpecId(0);
                 goodsSpecItemRepository.save(goodsSpecItem);
 
-                return ServerResponse.createBySuccess("商品添加成功");
+                return ServerResponse.createBySuccess("商品添加成功",returnGoods.getGoodsId());
 
     }
 
