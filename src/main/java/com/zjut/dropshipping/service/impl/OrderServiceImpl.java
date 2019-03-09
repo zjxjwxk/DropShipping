@@ -4,11 +4,7 @@ import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.*;
-import com.zjut.dropshipping.dto.OrderDTO;
-import com.zjut.dropshipping.dto.OrderDetailDTO;
-import com.zjut.dropshipping.dto.OrderItemDTO;
-import com.zjut.dropshipping.dto.ProducerOrderDTO;
-import com.zjut.dropshipping.dto.SpecificationDTO;
+import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
     private final GoodsSpecItemRepository goodsSpecItemRepository;
     private final AgentRepository agentRepository;
     private final RefundStatusRepository refundStatusRepository;
-
+    private final EvaluationRepository evaluationRepository;
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             BuyerRepository buyerRepository,
@@ -44,7 +40,8 @@ public class OrderServiceImpl implements OrderService {
                             SpecificationRepository specificationRepository,
                             GoodsSpecItemRepository goodsSpecItemRepository,
                             AgentRepository agentRepository,
-                            RefundStatusRepository refundStatusRepository) {
+                            RefundStatusRepository refundStatusRepository,
+                            EvaluationRepository evaluationRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
@@ -55,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
         this.goodsSpecItemRepository = goodsSpecItemRepository;
         this.agentRepository = agentRepository;
         this.refundStatusRepository = refundStatusRepository;
+        this.evaluationRepository = evaluationRepository;
     }
 
 
@@ -122,6 +120,7 @@ public class OrderServiceImpl implements OrderService {
         }
         return ServerResponse.createBySuccess(this.producerGetOrderDTOList(orderList));
     }
+
 
     @Override
     public ServerResponse agentModifyOrderState(Integer agent, Integer orderId, String type) {
@@ -302,7 +301,48 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findOneByOrderId(orderId);
         order.setState(Const.OrderState.REJECTED);
         orderRepository.save(order);
-        return  ServerResponse.createBySuccess("驳回");
+        return  ServerResponse.createBySuccessMessage("驳回");
+    }
+    @Override
+    public ServerResponse refundOrderStateReceieve(Integer orderId){
+        RefundStatus refundStatus = refundStatusRepository.findOneByOrderId(orderId);
+        refundStatus.setRefundStatus(Const.RefundStatus.REFUND_SUCCESS);
+        refundStatusRepository.save(refundStatus);
+        return  ServerResponse.createBySuccessMessage("退款成功");
     }
 
+    @Override
+    public ServerResponse refundOrderStateReject(Integer orderId){
+        RefundStatus refundStatus = refundStatusRepository.findOneByOrderId(orderId);
+        refundStatus.setRefundStatus(Const.RefundStatus.REFUND_FAILED);
+        refundStatusRepository.save(refundStatus);
+        return  ServerResponse.createBySuccessMessage("退款失败");
+    }
+
+    @Override
+    public ServerResponse producerGetEvaluation(Integer producerId,Integer orderId){
+        EvaluationDTO evaluationDTO=new EvaluationDTO();
+        Evaluation evaluation=evaluationRepository.findByOrderIdAndProducerId(producerId,orderId);
+        if (evaluation.getContent()==null){
+            return ServerResponse.createByErrorMessage("请评价");
+        }
+        evaluationDTO.setContent(evaluation.getContent());
+        evaluationDTO.setCreateTime(evaluation.getCreateTime());;
+        evaluationDTO.setLevel(evaluation.getLevel());
+        return  ServerResponse.createBySuccess(evaluationDTO);
+    }
+
+    @Override
+    public ServerResponse producerSetEvaluation(Integer producerId,Integer orderId,Integer agentId,Integer level,String content){
+        Evaluation evaluation=evaluationRepository.findOneByOrderId(orderId);
+        evaluation.setOrderId(orderId);
+        evaluation.setAgentId(agentId);
+        evaluation.setProducerId(producerId);
+        evaluation.setDirection(1);
+        evaluation.setLevel(evaluation.getLevel());
+        evaluation.setContent(evaluation.getContent());
+
+
+        return  ServerResponse.createBySuccessMessage("评价成功");
+    }
 }

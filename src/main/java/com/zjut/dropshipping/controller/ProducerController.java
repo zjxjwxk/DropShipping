@@ -165,4 +165,6 @@ public class ProducerController {
         return producerService.getSaleAnalysis(producer.getId(), time,form);
     }
 
+
+
 }

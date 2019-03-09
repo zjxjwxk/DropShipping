@@ -17,7 +17,9 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 @IdClass(Evaluation.class)
 public class Evaluation implements Serializable {
+
     @Id
+    private Integer orderId;
     private Integer producerId;
     private Integer agentId;
     private Integer direction;
