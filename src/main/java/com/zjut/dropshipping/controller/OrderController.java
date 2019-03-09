@@ -97,6 +97,26 @@ public class OrderController {
         return orderService.orderStateReject(orderId);
     }
 
+    @PostMapping("/refund_order_state_reject")
+    @ResponseBody
+    public ServerResponse refundOrderStateReject(HttpSession session,Integer orderId) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.refundOrderStateReject(orderId);
+    }
+
+    @PostMapping("/refund_order_state_receieve")
+    @ResponseBody
+    public ServerResponse refundOrderStateReceieve(HttpSession session,Integer orderId) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.refundOrderStateReceieve(orderId);
+    }
+
     @PostMapping("/agent_modify_order_state")
     @ResponseBody
     public ServerResponse agentModifyOrderState(HttpSession session, Integer orderId, String type) {
@@ -105,5 +125,35 @@ public class OrderController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
         return orderService.agentModifyOrderState(agent.getId(), orderId, type);
+    }
+
+    @GetMapping("/producer_get_refund_order_list")
+    @ResponseBody
+    public ServerResponse producerGetRefundOrderList(HttpSession session) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.producerGetOrderList(producer.getId());
+    }
+
+    @GetMapping("/producer_get_evaluation")
+    @ResponseBody
+    public ServerResponse producerGetEvaluation(HttpSession session,Integer orderId) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.producerGetEvaluation(producer.getId(),orderId);
+    }
+
+    @PostMapping("/producer_set_evaluation")
+    @ResponseBody
+    public ServerResponse producerSetEvaluation(HttpSession session,Integer orderId,Integer agentId,Integer level,String content) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.producerSetEvaluation(producer.getId(),orderId,agentId,level,content);
     }
 }

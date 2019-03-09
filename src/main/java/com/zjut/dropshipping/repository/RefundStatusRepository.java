@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface RefundStatusRepository extends JpaRepository<RefundStatus, Integer> {
 
+    RefundStatus findOneByOrderId(Integer orderId);
 
 }

@@ -11,4 +11,8 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Integer>
 
     @Query("select avg(level) from Evaluation where direction = 1 and agentId = ?1")
     Integer findLevelByAgentId(Integer agentId);
+
+    Evaluation findOneByOrderId(Integer OrderId);
+
+    Evaluation findByOrderIdAndProducerId(Integer producerId,Integer agentId);
 }

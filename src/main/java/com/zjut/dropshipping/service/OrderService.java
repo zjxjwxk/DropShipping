@@ -25,5 +25,14 @@ public interface OrderService {
 
     ServerResponse orderStateReject(Integer orderId);
 
+    ServerResponse refundOrderStateReceieve(Integer orderId);
+
+    ServerResponse refundOrderStateReject(Integer orderId);
+
     ServerResponse agentModifyOrderState(Integer agentId, Integer orderId, String type);
+
+    ServerResponse producerGetEvaluation(Integer producerId,Integer orderId);
+
+    ServerResponse producerSetEvaluation(Integer producerId,Integer orderId,Integer agentId,Integer level,String content);
+
 }

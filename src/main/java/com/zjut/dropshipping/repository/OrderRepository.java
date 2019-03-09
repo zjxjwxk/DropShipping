@@ -17,8 +17,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     List<Order> findByAgentId(Integer agentId);
 
+    @Query(value="select * from `order` where order_id in (select order_id from refund_status where refund_status= '退款中') and producer_id=?1", nativeQuery = true)
+    List<Order> findRefundOrder(Integer producerId);
+
     @Query(value="select sum(amount) from order_item where order_id in (select order_id from `order` where agent_id= ?1)", nativeQuery = true)
     Integer findAmountByAgentId(Integer agentId);
+
 
     @Query(value="select sum(order_id) from `order` where producer_id = ?1 " +
             "and state= '已完成 '" +
