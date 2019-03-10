@@ -137,6 +137,16 @@ public class OrderController {
         return orderService.producerGetOrderList(producer.getId());
     }
 
+    @GetMapping("/agent_get_evaluation")
+    @ResponseBody
+    public ServerResponse agentGetEvaluation(HttpSession session, Integer orderId) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.agentGetEvaluation(orderId);
+    }
+
     @GetMapping("/producer_get_evaluation")
     @ResponseBody
     public ServerResponse producerGetEvaluation(HttpSession session,Integer orderId) {

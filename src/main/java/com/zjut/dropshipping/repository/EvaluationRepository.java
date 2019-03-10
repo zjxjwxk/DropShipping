@@ -14,5 +14,7 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Integer>
 
     Evaluation findOneByOrderId(Integer OrderId);
 
+    Evaluation findByOrderIdAndDirection(Integer orderId, Integer direction);
+
     Evaluation findByOrderIdAndProducerId(Integer producerId,Integer agentId);
 }

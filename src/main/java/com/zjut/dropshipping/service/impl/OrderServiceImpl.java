@@ -320,6 +320,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public ServerResponse agentGetEvaluation(Integer orderId) {
+        Evaluation evaluation = evaluationRepository.findByOrderIdAndDirection(orderId, 1);
+        if (evaluation == null) {
+            return ServerResponse.createByErrorMessage("该订单不存在或暂无评论");
+        } else {
+            return ServerResponse.createBySuccess(evaluation.getContent());
+        }
+    }
+
+    @Override
     public ServerResponse producerGetEvaluation(Integer producerId,Integer orderId){
         EvaluationDTO evaluationDTO=new EvaluationDTO();
         Evaluation evaluation=evaluationRepository.findByOrderIdAndProducerId(producerId,orderId);
