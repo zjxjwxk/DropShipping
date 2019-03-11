@@ -31,7 +31,13 @@ public interface OrderService {
 
     ServerResponse agentModifyOrderState(Integer agentId, Integer orderId, String type);
 
-    ServerResponse agentGetEvaluation(Integer orderId);
+    ServerResponse getEvaluationFromAgentToProducer(Integer orderId);
+
+    ServerResponse agentEvaluateToProducer(Integer agentId, Integer orderId, Integer level, String content);
+
+    ServerResponse getGoodsEvaluation(Integer orderId);
+
+    ServerResponse agentEvaluateToGoods(Integer agentId, Integer orderId, Integer goodsId, Integer level, String content);
 
     ServerResponse producerGetEvaluation(Integer producerId,Integer orderId);
 

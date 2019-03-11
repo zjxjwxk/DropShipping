@@ -13,6 +13,10 @@ public interface GoodsEvaluationRepository extends JpaRepository<GoodsEvaluation
 
     List<GoodsEvaluation> findByGoodsId(Integer goodsId);
 
+    List<GoodsEvaluation> findByOrderId(Integer orderId);
+
+    GoodsEvaluation findByOrderIdAndGoodsId(Integer orderId, Integer goodsId);
+
     @Query(value="select avg(level) from GoodsEvaluation where goodsId = ?1", nativeQuery = true)
     Double findAverageLevelByGoodsId(Integer goodsId);
 }

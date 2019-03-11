@@ -137,14 +137,36 @@ public class OrderController {
         return orderService.producerGetOrderList(producer.getId());
     }
 
-    @GetMapping("/agent_get_evaluation")
+    @GetMapping("/get_evaluation_from_agent_to_producer")
     @ResponseBody
-    public ServerResponse agentGetEvaluation(HttpSession session, Integer orderId) {
+    public ServerResponse getEvaluationFromAgentToProducer(Integer orderId) {
+        return orderService.getEvaluationFromAgentToProducer(orderId);
+    }
+
+    @PostMapping("/agent_evaluate_to_producer")
+    @ResponseBody
+    public ServerResponse agentEvaluateToProducer(HttpSession session, Integer orderId, Integer level, String content) {
         Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        return orderService.agentGetEvaluation(orderId);
+        return orderService.agentEvaluateToProducer(agent.getId(), orderId, level, content);
+    }
+
+    @GetMapping("/get_goods_evaluation")
+    @ResponseBody
+    public ServerResponse getGoodsEvaluation(Integer orderId) {
+        return orderService.getGoodsEvaluation(orderId);
+    }
+
+    @PostMapping("/agent_evaluate_to_goods")
+    @ResponseBody
+    public ServerResponse agentEvaluateToGoods(HttpSession session, Integer orderId, Integer goodsId, Integer level, String content) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return orderService.agentEvaluateToGoods(agent.getId(), orderId, goodsId, level, content);
     }
 
     @GetMapping("/producer_get_evaluation")
