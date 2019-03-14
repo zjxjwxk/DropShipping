@@ -90,5 +90,10 @@ public class Const {
     }
 
 
+    public interface RequestMethod {
 
+        String GET = "GET";
+
+        String POST = "POST";
+    }
 }
