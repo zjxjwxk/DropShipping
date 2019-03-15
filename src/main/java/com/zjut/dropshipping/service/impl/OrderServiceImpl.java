@@ -30,6 +30,8 @@ public class OrderServiceImpl implements OrderService {
     private final AgentRepository agentRepository;
     private final RefundStatusRepository refundStatusRepository;
     private final EvaluationRepository evaluationRepository;
+    private final GoodsEvaluationRepository goodsEvaluationRepository;
+
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             BuyerRepository buyerRepository,
@@ -41,7 +43,8 @@ public class OrderServiceImpl implements OrderService {
                             GoodsSpecItemRepository goodsSpecItemRepository,
                             AgentRepository agentRepository,
                             RefundStatusRepository refundStatusRepository,
-                            EvaluationRepository evaluationRepository) {
+                            EvaluationRepository evaluationRepository,
+                            GoodsEvaluationRepository goodsEvaluationRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
@@ -53,6 +56,7 @@ public class OrderServiceImpl implements OrderService {
         this.agentRepository = agentRepository;
         this.refundStatusRepository = refundStatusRepository;
         this.evaluationRepository = evaluationRepository;
+        this.goodsEvaluationRepository = goodsEvaluationRepository;
     }
 
 
@@ -164,6 +168,81 @@ public class OrderServiceImpl implements OrderService {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         return ServerResponse.createBySuccess("修改订单状态成功");
+    }
+
+    @Override
+    public ServerResponse getEvaluationFromAgentToProducer(Integer orderId) {
+        Evaluation evaluation = evaluationRepository.findByOrderIdAndDirection(orderId, 2);
+        if (evaluation == null) {
+            return ServerResponse.createByErrorMessage("该订单不存在或暂无评价");
+        } else {
+            EvaluationDTO evaluationDTO = new EvaluationDTO(evaluation.getLevel(), evaluation.getContent());
+            return ServerResponse.createBySuccess(evaluationDTO);
+        }
+    }
+
+    @Override
+    public ServerResponse agentEvaluateToProducer(Integer agentId, Integer orderId, Integer level, String content) {
+        Evaluation evaluation = evaluationRepository.findByOrderIdAndDirection(orderId, 2);
+        if (evaluation != null) {
+            return ServerResponse.createByErrorMessage("已进行过评价");
+        } else {
+            Order order = orderRepository.findOneByOrderId(orderId);
+            if (order == null) {
+                return ServerResponse.createByErrorMessage("该订单不存在");
+            } else if (!order.getAgentId().equals(agentId)) {
+                return ServerResponse.createByErrorMessage("无法评价他人的订单");
+            } else {
+                evaluation = new Evaluation(orderId, order.getProducerId(), order.getAgentId(), 2, level, content);
+                if (evaluationRepository.save(evaluation) != null) {
+                    return ServerResponse.createBySuccess("评价成功");
+                } else {
+                    return ServerResponse.createByErrorMessage("评价失败");
+                }
+            }
+        }
+    }
+
+    @Override
+    public ServerResponse getGoodsEvaluation(Integer orderId) {
+        List<GoodsEvaluation> goodsEvaluationList = goodsEvaluationRepository.findByOrderId(orderId);
+        if (goodsEvaluationList.size() == 0) {
+            return ServerResponse.createByErrorMessage("该订单不存在或暂无对商品的评价");
+        }
+        return ServerResponse.createBySuccess(this.getGoodsEvaluationDTOList(goodsEvaluationList));
+    }
+
+    @Override
+    public ServerResponse agentEvaluateToGoods(Integer agentId, Integer orderId, Integer goodsId, Integer level, String content) {
+        GoodsEvaluation goodsEvaluation = goodsEvaluationRepository.findByOrderIdAndGoodsId(orderId, goodsId);
+        if (goodsEvaluation != null) {
+            return ServerResponse.createByErrorMessage("已进行过评价");
+        } else {
+            Order order = orderRepository.findOneByOrderId(orderId);
+            if (order == null) {
+                return ServerResponse.createByErrorMessage("该订单不存在");
+            } else if (!order.getAgentId().equals(agentId)) {
+                return ServerResponse.createByErrorMessage("无法评价他人的订单");
+            } else {
+                goodsEvaluation = new GoodsEvaluation(orderId, goodsId, agentId, level, content);
+                if (goodsEvaluationRepository.save(goodsEvaluation) != null) {
+                    return ServerResponse.createBySuccess("评价成功");
+                } else {
+                    return ServerResponse.createByErrorMessage("评价失败");
+                }
+            }
+        }
+    }
+
+    private List<GoodsEvaluationDTO> getGoodsEvaluationDTOList(List<GoodsEvaluation> goodsEvaluationList) {
+        List<GoodsEvaluationDTO> goodsEvaluationDTOList = new ArrayList<>();
+        for (GoodsEvaluation goodsEvaluation:
+             goodsEvaluationList) {
+            GoodsEvaluationDTO goodsEvaluationDTO = new GoodsEvaluationDTO(goodsEvaluation.getGoodsId(),
+                    goodsEvaluation.getLevel(), goodsEvaluation.getContent(), goodsEvaluation.getCreateTime());
+            goodsEvaluationDTOList.add(goodsEvaluationDTO);
+        }
+        return goodsEvaluationDTOList;
     }
 
     private void saveOrderItemList(Integer orderId, OrderItem[] orderItemList) {

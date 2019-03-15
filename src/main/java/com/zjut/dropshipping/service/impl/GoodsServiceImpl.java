@@ -182,20 +182,14 @@ public class GoodsServiceImpl implements GoodsService {
         GoodsSpecItem goodsSpecItem = new GoodsSpecItem();
         Specification specification = new Specification();
         if(specificationRepository.findByNameAndValue(name,value) == null ){
-
             specification.setName(name);
             specification.setValue(value);
             specificationRepository.save(specification);
-            goodsSpecItem.setPriceDifference(price-goodsRepository.findPriceByGoodId(goodsId));
-            goodsSpecItem.setGoodsId(goodsId);
-            goodsSpecItem.setSpecId(specificationRepository.findSpeId(name,value));
-            goodsSpecItemRepository.save(goodsSpecItem);
-
-            return ServerResponse.createBySuccessMessage("添加成功");
-        }else{
-            return ServerResponse.createByErrorMessage("该型号已存在");
         }
+        goodsSpecItem.setPriceDifference(price-goodsRepository.findPriceByGoodId(goodsId));
+        goodsSpecItem.setGoodsId(goodsId);
+        goodsSpecItem.setSpecId(specificationRepository.findSpeId(name,value));
+        goodsSpecItemRepository.save(goodsSpecItem);
+        return ServerResponse.createBySuccessMessage("添加成功");
     }
-
-
-    }
+}

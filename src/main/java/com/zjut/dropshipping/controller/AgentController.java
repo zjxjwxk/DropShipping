@@ -29,6 +29,12 @@ public class AgentController {
         this.fileService = fileService;
     }
 
+    /**
+     * 代理商注册
+     * @param agent 代理商对象信息
+     * @param session session
+     * @return 服务响应对象
+     */
     @PostMapping("/register")
     @ResponseBody
     public ServerResponse register(Agent agent, HttpSession session) {
@@ -39,6 +45,13 @@ public class AgentController {
         return response;
     }
 
+    /**
+     * 代理商登录
+     * @param phone 手机号
+     * @param password 密码
+     * @param session session
+     * @return 服务响应对象
+     */
     @PostMapping("/login")
     @ResponseBody
     public ServerResponse<Agent> login(String phone, String password, HttpSession session) {
@@ -49,6 +62,14 @@ public class AgentController {
         return response;
     }
 
+    /**
+     * 代理商上传身份证照片
+     * @param session session
+     * @param request servlet请求对象
+     * @param file 文件
+     * @param type 文件类型 (IDCard-1 或 IDCard-2) (即正面和反面)
+     * @return 服务响应对象
+     */
     @PostMapping("/IDCard-upload")
     @ResponseBody
     public ServerResponse upload(HttpSession session, HttpServletRequest request,
@@ -62,6 +83,12 @@ public class AgentController {
         return fileService.IDCardUpload(file, path, type, agent.getId(), agent.getIdentityNumber());
     }
 
+    /**
+     * 代理商请求厂商合作协议
+     * @param session session
+     * @param producerId 厂商id
+     * @return 服务响应对象
+     */
     @PostMapping("/request_agreement")
     @ResponseBody
     public ServerResponse requestAgreement(HttpSession session, Integer producerId) {
@@ -78,6 +105,12 @@ public class AgentController {
         }
     }
 
+    /**
+     * 代理商获取（合作中/请求合作）厂商列表
+     * @param session session
+     * @param state 合作厂商状态（"正常" 或 "厂商发送请求"）
+     * @return 服务响应对象
+     */
     @GetMapping("/get_agreement_producer")
     @ResponseBody
     public ServerResponse getAgreementProducer(HttpSession session, String state) {
@@ -88,6 +121,13 @@ public class AgentController {
         return agentService.getAgreementProducer(agent.getId(), state);
     }
 
+    /**
+     * 代理商回应厂商合作请求
+     * @param session session
+     * @param producerId 厂商id
+     * @param response 回应方式 (accept 或 refuse)
+     * @return 服务响应对象
+     */
     @PostMapping("/response_producer_agreement_request")
     @ResponseBody
     public ServerResponse responseProducerAgreementRequest(HttpSession session, Integer producerId, String response) {
@@ -98,6 +138,12 @@ public class AgentController {
         return agentService.responseProducerAgreementRequest(agent.getId(), producerId, response);
     }
 
+    /**
+     * 代理商解除与厂商的合作协议
+     * @param session session
+     * @param producerId 厂商id
+     * @return 服务响应对象
+     */
     @PostMapping("/cancel_agreement")
     @ResponseBody
     public ServerResponse cancelAgreement(HttpSession session, Integer producerId) {
@@ -108,6 +154,13 @@ public class AgentController {
         return agentService.cancelAgreement(agent.getId(), producerId);
     }
 
+    /**
+     * 代理商获取推荐厂商列表
+     * @param session session
+     * @param pageNumber 当前页码数
+     * @param numberOfElements 每页的数量
+     * @return 服务响应对象
+     */
     @GetMapping("/get_recommend_producer")
     @ResponseBody
     public ServerResponse getRecommendProducer(HttpSession session,

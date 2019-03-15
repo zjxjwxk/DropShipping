@@ -17,14 +17,26 @@ import java.util.Date;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Data
-@IdClass(GoodsEvaluation.class)
+@IdClass(GoodsEvaluationMultiKeys.class)
 public class GoodsEvaluation implements Serializable {
 
     @Id
+    private Integer orderId;
     private Integer goodsId;
     private Integer agentId;
     private Integer level;
     private String content;
     @CreatedDate
     private Date createTime;
+
+    public GoodsEvaluation() {
+    }
+
+    public GoodsEvaluation(Integer orderId, Integer goodsId, Integer agentId, Integer level, String content) {
+        this.orderId = orderId;
+        this.goodsId = goodsId;
+        this.agentId = agentId;
+        this.level = level;
+        this.content = content;
+    }
 }

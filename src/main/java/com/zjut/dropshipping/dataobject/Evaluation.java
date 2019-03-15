@@ -27,4 +27,16 @@ public class Evaluation implements Serializable {
     private String content;
     @CreatedDate
     private Date createTime;
+
+    public Evaluation() {
+    }
+
+    public Evaluation(Integer orderId, Integer producerId, Integer agentId, Integer direction, Integer level, String content) {
+        this.orderId = orderId;
+        this.producerId = producerId;
+        this.agentId = agentId;
+        this.direction = direction;
+        this.level = level;
+        this.content = content;
+    }
 }

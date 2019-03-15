@@ -23,6 +23,6 @@ public interface GoodsRepository extends JpaRepository<Goods, Integer> {
 
     Page<Goods> findByProducerIdAndCategoryIdIn(Integer producerId, List<Integer> categoryIdList, Pageable pageable);
 
-    @Query(value = "select pirce from goods where goods_id = ?1",nativeQuery = true)
+    @Query(value = "select price from goods where goods_id = ?1",nativeQuery = true)
     Double findPriceByGoodId(Integer goodsId);
 }
