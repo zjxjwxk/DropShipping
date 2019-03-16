@@ -54,8 +54,15 @@ public class GoodsController {
 
     @GetMapping("/get_detail")
     @ResponseBody
-    public ServerResponse getDetail(Integer goodsId) {
-        return goodsService.getDetail(goodsId);
+    public ServerResponse getDetail(HttpSession session, Integer goodsId) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (agent != null) {
+            return goodsService.getDetail(agent.getRegion(), goodsId);
+        } else if (producer != null) {
+            return goodsService.getDetail(producer.getRegion(), goodsId);
+        }
+        return goodsService.getDetail(null, goodsId);
     }
 
     @GetMapping("/get_evaluation")

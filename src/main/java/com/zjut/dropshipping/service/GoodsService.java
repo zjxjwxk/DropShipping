@@ -10,7 +10,7 @@ public interface GoodsService {
     ServerResponse getList(String country, String keyword, Integer categoryId, Integer producerId, Integer agreementAgentId,
                            Integer pageNum, Integer pageSize, String orderBy);
 
-    ServerResponse getDetail(Integer goodsId);
+    ServerResponse getDetail(String country, Integer goodsId);
 
     ServerResponse getSalesVolume(Integer goodsId);
 

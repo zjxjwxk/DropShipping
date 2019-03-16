@@ -78,7 +78,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public ServerResponse getDetail(Integer goodsId) {
+    public ServerResponse getDetail(String country, Integer goodsId) {
 
         Goods goods = goodsRepository.findByGoodsId(goodsId);
 
@@ -88,6 +88,7 @@ public class GoodsServiceImpl implements GoodsService {
 
         goods.setCreateTime(null);
         goods.setUpdateTime(null);
+        goods.setPrice(exchangeRateService.getExchangePrice(country, goods.getPrice()));
 
         return ServerResponse.createBySuccess(goods);
     }
