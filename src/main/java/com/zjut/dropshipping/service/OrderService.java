@@ -19,7 +19,7 @@ public interface OrderService {
 
     ServerResponse producerGetOrderList(Integer producerId);
 
-    ServerResponse getOrderDetail(Integer orderId);
+    ServerResponse getOrderDetail(String country, Integer orderId);
 
     ServerResponse orderStateReceive(Integer orderId);
 

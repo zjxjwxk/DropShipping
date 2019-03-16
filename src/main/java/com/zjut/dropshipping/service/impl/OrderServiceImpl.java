@@ -6,6 +6,7 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.*;
+import com.zjut.dropshipping.service.ExchangeRateService;
 import com.zjut.dropshipping.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ public class OrderServiceImpl implements OrderService {
     private final CountryCurrencyRepository countryCurrencyRepository;
     private final ExchangeRateRepository exchangeRateRepository;
 
+    private final ExchangeRateService exchangeRateService;
+
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             BuyerRepository buyerRepository,
@@ -48,7 +51,8 @@ public class OrderServiceImpl implements OrderService {
                             EvaluationRepository evaluationRepository,
                             GoodsEvaluationRepository goodsEvaluationRepository,
                             CountryCurrencyRepository countryCurrencyRepository,
-                            ExchangeRateRepository exchangeRateRepository) {
+                            ExchangeRateRepository exchangeRateRepository,
+                            ExchangeRateService exchangeRateService) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
@@ -63,6 +67,7 @@ public class OrderServiceImpl implements OrderService {
         this.goodsEvaluationRepository = goodsEvaluationRepository;
         this.countryCurrencyRepository = countryCurrencyRepository;
         this.exchangeRateRepository = exchangeRateRepository;
+        this.exchangeRateService = exchangeRateService;
     }
 
 
@@ -114,12 +119,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ServerResponse getOrderDetail(Integer orderId) {
+    public ServerResponse getOrderDetail(String country, Integer orderId) {
         Order order = orderRepository.findOneByOrderId(orderId);
         if (order == null) {
             return ServerResponse.createByErrorMessage("该订单不存在");
         }
-        return ServerResponse.createBySuccess(this.getOrderDetailDTO(order));
+        return ServerResponse.createBySuccess(this.getOrderDetailDTO(country, order));
     }
 
     @Override
@@ -349,9 +354,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             // 根据汇率转换为对应货币价格
-            CountryCurrency countryCurrency = countryCurrencyRepository.findByCountry(country);
-            ExchangeRate exchangeRate = exchangeRateRepository.findByName(countryCurrency.getCurrency());
-            orderItemDTO.setPrice(orderItemDTO.getPrice() / exchangeRate.getRate());
+            orderItemDTO.setPrice(exchangeRateService.getExchangePrice(country, orderItemDTO.getPrice()));
 
             orderItemDTO.setGoodsId(goods.getGoodsId());
             orderItemDTO.setSpecificationList(specificationDTOList);
@@ -363,13 +366,14 @@ public class OrderServiceImpl implements OrderService {
         return orderItemDTOList;
     }
 
-    private OrderDetailDTO getOrderDetailDTO(Order order) {
+    private OrderDetailDTO getOrderDetailDTO(String country, Order order) {
         OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
         Logistic logistic = logisticRepository.findByOrderId(order.getOrderId());
         Buyer buyer = buyerRepository.findBuyerById(order.getBuyerId());
 
         if (logistic != null) {
             logistic.setOrderId(null);
+            logistic.setPrice(exchangeRateService.getExchangePrice(country, logistic.getPrice()));
         }
         orderDetailDTO.setLogistic(logistic);
 

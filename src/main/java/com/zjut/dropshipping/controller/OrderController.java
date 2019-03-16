@@ -62,9 +62,16 @@ public class OrderController {
 
     @GetMapping("/get_order_detail")
     @ResponseBody
-    public ServerResponse getOrderDetail(Integer orderId) {
-
-        return orderService.getOrderDetail(orderId);
+    public ServerResponse getOrderDetail(HttpSession session, Integer orderId) {
+        if (session.getAttribute(Const.CURRENT_AGENT) != null) {
+            Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+            return orderService.getOrderDetail(agent.getRegion(), orderId);
+        } else if (session.getAttribute(Const.CURRENT_PRODUCER) != null) {
+            Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+            return orderService.getOrderDetail(producer.getRegion(), orderId);
+        } else {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
     }
 
     @GetMapping("/producer_get_order_list")
