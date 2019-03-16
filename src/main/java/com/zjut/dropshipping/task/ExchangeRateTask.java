@@ -74,7 +74,7 @@ public class ExchangeRateTask {
         JSONArray jsonArray = (JSONArray) result;
         Map<String, JSONObject> jsonObjectMap = (Map<String, JSONObject>) jsonArray.toList().get(0);
         for (Map.Entry<String, JSONObject> entry:
-             jsonObjectMap.entrySet()) {
+                jsonObjectMap.entrySet()) {
             Map<String, String> paramMap = (Map<String, String>) entry.getValue();
             String name = paramMap.get("name");
             Double bankConversionPri = Double.parseDouble(paramMap.get("bankConversionPri")) / 100;

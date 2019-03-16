@@ -165,6 +165,25 @@ public class ProducerController {
         return producerService.getSaleAnalysis(producer.getId(), time,form);
     }
 
+    @GetMapping("get_warehouse_list")
+    @ResponseBody
+    public ServerResponse getWarehouseList(HttpSession session) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.getWarehouseList(producer.getId());
+    }
 
+    @GetMapping("get_detail_warehouse_list")
+    @ResponseBody
+    public ServerResponse getDetailWarehouseList(HttpSession session,
+                                           String country) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.getDetailWarehouseList(country);
+    }
 
 }
