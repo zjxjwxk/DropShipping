@@ -4,6 +4,7 @@ import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.OrderItem;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zjxjwxk
@@ -20,6 +21,10 @@ public interface OrderService {
     ServerResponse producerGetOrderList(Integer producerId);
 
     ServerResponse getOrderDetail(String country, Integer orderId);
+
+    ServerResponse pay(Integer agentId, Integer orderId, String path);
+
+    ServerResponse aliCallback(Map<String, String> params);
 
     ServerResponse orderStateReceive(Integer orderId);
 

@@ -38,6 +38,8 @@ public class Const {
 
     public interface OrderState {
 
+        String TO_BE_PAID = "待付款";
+
         String TO_BE_CONFIRMED = "待确认";
 
         String TO_BE_RECEIVED = "待收货";
@@ -87,8 +89,17 @@ public class Const {
         String IDENTITY_CARD_2 = "IDCard-2";
 
         String GOODS = "goods";
+
+        String QRCODE = "QRCode";
     }
 
+    public interface AlipayCallback{
+        String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";
+        String TRADE_STATUS_TRADE_SUCCESS = "TRADE_SUCCESS";
+
+        String RESPONSE_SUCCESS = "success";
+        String RESPONSE_FAILED = "failed";
+    }
 
     public interface RequestMethod {
 
