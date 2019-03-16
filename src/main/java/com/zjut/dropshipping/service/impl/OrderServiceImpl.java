@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -451,7 +452,8 @@ public class OrderServiceImpl implements OrderService {
                 orderItemList) {
             totalAmount += this.getItemPrice(orderItem) * orderItem.getAmount();
         }
-        return totalAmount;
+        DecimalFormat df = new DecimalFormat("0.00");
+        return Double.parseDouble(df.format(totalAmount));
     }
 
     private List<GoodsEvaluationDTO> getGoodsEvaluationDTOList(List<GoodsEvaluation> goodsEvaluationList) {
