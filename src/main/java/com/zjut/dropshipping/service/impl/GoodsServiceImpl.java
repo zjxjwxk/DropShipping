@@ -6,6 +6,7 @@ import com.zjut.dropshipping.dataobject.*;
 import com.zjut.dropshipping.dto.*;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.CategoryService;
+import com.zjut.dropshipping.service.ExchangeRateService;
 import com.zjut.dropshipping.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ public class GoodsServiceImpl implements GoodsService {
     private final GoodsSpecItemRepository goodsSpecItemRepository;
 
     private final CategoryService categoryService;
+    private final ExchangeRateService exchangeRateService;
 
     @Autowired
     public GoodsServiceImpl(GoodsRepository goodsRepository,
@@ -42,7 +44,8 @@ public class GoodsServiceImpl implements GoodsService {
                             CategoryService categoryService,
                             OrderItemRepository orderItemRepository,
                             SpecificationRepository specificationRepository,
-                            GoodsSpecItemRepository goodsSpecItemRepository) {
+                            GoodsSpecItemRepository goodsSpecItemRepository,
+                            ExchangeRateService exchangeRateService) {
         this.goodsRepository = goodsRepository;
         this.agentRepository = agentRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
@@ -52,10 +55,11 @@ public class GoodsServiceImpl implements GoodsService {
         this.orderItemRepository = orderItemRepository;
         this.specificationRepository = specificationRepository;
         this.goodsSpecItemRepository = goodsSpecItemRepository;
+        this.exchangeRateService = exchangeRateService;
     }
 
     @Override
-    public ServerResponse getList(String keyword, Integer categoryId, Integer producerId,
+    public ServerResponse getList(String country, String keyword, Integer categoryId, Integer producerId,
                                   Integer agreementAgentId, Integer pageNum, Integer pageSize,
                                   String orderBy) {
         List<Integer> categoryIdList = categoryService.getCategoryAndChildrenIdListByParentId(categoryId);
@@ -70,7 +74,7 @@ public class GoodsServiceImpl implements GoodsService {
             goodsPage = goodsRepository.findByCategoryIdIn(categoryIdList, pageable);
         }
 
-        return ServerResponse.createBySuccess(this.getPageChunk(goodsPage));
+        return ServerResponse.createBySuccess(this.getPageChunk(country, goodsPage));
     }
 
     @Override
@@ -151,9 +155,9 @@ public class GoodsServiceImpl implements GoodsService {
         return goodsEvaluationDTOList;
     }
 
-    private PageChunk<GoodsListDTO> getPageChunk(Page<Goods> goodsPage) {
+    private PageChunk<GoodsListDTO> getPageChunk(String country, Page<Goods> goodsPage) {
         PageChunk<GoodsListDTO> pageChunk = new PageChunk<>();
-        pageChunk.setContent(this.getGoodsListDTOList(goodsPage.getContent()));
+        pageChunk.setContent(this.getGoodsListDTOList(country, goodsPage.getContent()));
         pageChunk.setTotalPages(goodsPage.getTotalPages());
         pageChunk.setTotalElements(goodsPage.getTotalElements());
         pageChunk.setPageNumber(goodsPage.getPageable().getPageNumber() + 1);
@@ -161,14 +165,14 @@ public class GoodsServiceImpl implements GoodsService {
         return pageChunk;
     }
 
-    private List<GoodsListDTO> getGoodsListDTOList(List<Goods> goodsList) {
+    private List<GoodsListDTO> getGoodsListDTOList(String country, List<Goods> goodsList) {
         List<GoodsListDTO> goodsListDTOList = new ArrayList<>();
         for (Goods goods :
                 goodsList) {
             GoodsListDTO goodsListDTO = new GoodsListDTO();
             goodsListDTO.setGoodsId(goods.getGoodsId());
             goodsListDTO.setName(goods.getName());
-            goodsListDTO.setPrice(goods.getPrice());
+            goodsListDTO.setPrice(exchangeRateService.getExchangePrice(country, goods.getPrice()));
             Producer producer = producerRepository.findOneById(goods.getProducerId());
             goodsListDTO.setProducerId(producer.getId());
             goodsListDTO.setProducerName(producer.getName());

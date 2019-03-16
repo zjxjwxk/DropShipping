@@ -4,6 +4,7 @@ import com.zjut.dropshipping.common.Const;
 import com.zjut.dropshipping.common.ResponseCode;
 import com.zjut.dropshipping.common.ServerResponse;
 import com.zjut.dropshipping.dataobject.Agent;
+import com.zjut.dropshipping.dataobject.Producer;
 import com.zjut.dropshipping.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,14 +35,21 @@ public class GoodsController {
                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
                                   @RequestParam(value = "orderBy", defaultValue = "amount") String orderBy,
                                   HttpSession session) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
         if (inAgreement) {
-            Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
             if (agent == null) {
                 return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            } else {
+                return goodsService.getList(agent.getRegion(), keyword, categoryId, producerId, agent.getId(), pageNum, pageSize, orderBy);
             }
-            return goodsService.getList(keyword, categoryId, producerId, agent.getId(), pageNum, pageSize, orderBy);
+        } else if (agent != null) {
+            return ServerResponse.createBySuccess(goodsService.getList(agent.getRegion(), keyword, categoryId, producerId, null, pageNum, pageSize, orderBy));
+        } else if (producer != null) {
+            return ServerResponse.createBySuccess(goodsService.getList(producer.getRegion(), keyword, categoryId, producerId, null, pageNum, pageSize, orderBy));
+        } else {
+            return goodsService.getList(null, keyword, categoryId, producerId, null, pageNum, pageSize, orderBy);
         }
-        return goodsService.getList(keyword, categoryId, producerId, null, pageNum, pageSize, orderBy);
     }
 
     @GetMapping("/get_detail")

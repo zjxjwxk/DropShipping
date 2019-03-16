@@ -27,6 +27,9 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     @Override
     public Double getExchangePrice(String country, Double originPrice) {
+        if (country == null) {
+            country = "美国";
+        }
         CountryCurrency countryCurrency = countryCurrencyRepository.findByCountry(country);
         ExchangeRate exchangeRate = exchangeRateRepository.findByName(countryCurrency.getCurrency());
         return originPrice / exchangeRate.getRate();
