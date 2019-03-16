@@ -85,8 +85,16 @@ public class GoodsController {
 
     @GetMapping("/get_specification")
     @ResponseBody
-    public ServerResponse getSpecification(Integer goodsId) {
-        return goodsService.getSpecification(goodsId);
+    public ServerResponse getSpecification(HttpSession session, Integer goodsId) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (agent != null) {
+            return goodsService.getSpecification(agent.getRegion(), goodsId);
+        } else if (producer != null) {
+            return goodsService.getSpecification(producer.getRegion(), goodsId);
+        } else {
+            return goodsService.getSpecification(null, goodsId);
+        }
     }
 
     @PostMapping("/add_goods_model")

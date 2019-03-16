@@ -18,7 +18,7 @@ public interface GoodsService {
 
     ServerResponse getProducer(Integer goodsId);
 
-    ServerResponse getSpecification(Integer goodsId);
+    ServerResponse getSpecification(String country, Integer goodsId);
 
     ServerResponse addGoodsModel(Integer goodsId, String name, String value, Double price);
 }

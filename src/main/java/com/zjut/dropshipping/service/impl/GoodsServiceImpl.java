@@ -121,7 +121,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public ServerResponse getSpecification(Integer goodsId) {
+    public ServerResponse getSpecification(String country, Integer goodsId) {
         List<GoodsSpecItem> goodsSpecItemList = goodsSpecItemRepository.findByGoodsId(goodsId);
         List<SpecificationDTO> specificationDTOList = new ArrayList<>();
         if (goodsSpecItemList.size() == 0) {
@@ -132,7 +132,7 @@ public class GoodsServiceImpl implements GoodsService {
                 Specification specification = specificationRepository.findBySpecId(goodsSpecItem.getSpecId());
                 SpecificationDTO specificationDTO = new SpecificationDTO(goodsSpecItem.getGoodsSpecId(),
                         specification.getName(), specification.getValue(),
-                        goodsSpecItem.getPriceDifference());
+                        exchangeRateService.getExchangePrice(country, goodsSpecItem.getPriceDifference()));
                 specificationDTOList.add(specificationDTO);
             }
         }
