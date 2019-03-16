@@ -487,4 +487,43 @@ public class ProducerServiceImpl implements ProducerService {
         return ServerResponse.createBySuccess(detailWarehouseListDTOList);
     }
 
+    @Override
+    public ServerResponse changeWarehouseItemAmount(Integer warehouseId,Integer goodsId,Integer amountChange){
+        WarehouseItem warehouseItem = warehouseItemRepository.findByWarehouseIdAndGoodsId(warehouseId,goodsId);
+        warehouseItem.setAmount(warehouseItem.getAmount()+ amountChange);
+        warehouseItemRepository.save(warehouseItem);
+        return  ServerResponse.createBySuccessMessage("更改成功");
+    }
+
+    @Override
+    public ServerResponse addWarehouseItem(Integer warehouseId,Integer goodsId,Integer amount){
+        WarehouseItem warehouseItemExit = warehouseItemRepository.findByWarehouseIdAndGoodsId(warehouseId,goodsId);
+        WarehouseItem warehouseItem = new WarehouseItem();
+        if(warehouseItemExit == null){
+            warehouseItem.setWarehouseId(warehouseId);
+            warehouseItem.setGoodsId(goodsId);
+            warehouseItem.setAmount(amount);
+            warehouseItemRepository.save(warehouseItem);
+            return  ServerResponse.createBySuccessMessage("添加成功");
+        }else{
+            warehouseItem.setAmount(warehouseItem.getAmount()+ amount);
+            warehouseItemRepository.save(warehouseItem);
+            return  ServerResponse.createBySuccessMessage("添加成功");
+        }
+
+
+    }
+
+    @Override
+    public ServerResponse evaluateWarehouseItemAmount(Integer warehouseId,Integer goodsId,Integer amount){
+        WarehouseItem warehouseItem = warehouseItemRepository.findByWarehouseIdAndGoodsId(warehouseId,goodsId);
+        if(warehouseItem.getAmount()>= amount ){
+            return  ServerResponse.createBySuccessMessage("商品数量足够");
+        }else{
+            return  ServerResponse.createBySuccessMessage("商品数量不足");
+        }
+
+    }
+
+
 }

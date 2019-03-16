@@ -186,4 +186,42 @@ public class ProducerController {
         return producerService.getDetailWarehouseList(country);
     }
 
+    @PostMapping("change_warehouse_item_amount")
+    @ResponseBody
+    public ServerResponse changeWarehouseItemAmount(HttpSession session,
+                                                 Integer warehouseId,
+                                                 Integer goodsId,
+                                                 Integer amountChange) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.changeWarehouseItemAmount(warehouseId,goodsId,amountChange);
+    }
+
+    @PostMapping("add_warehouse_item")
+    @ResponseBody
+    public ServerResponse addWarehouseItem(HttpSession session,
+                                                       Integer warehouseId,
+                                                       Integer goodsId,
+                                                       Integer amount) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.addWarehouseItem(warehouseId,goodsId,amount);
+    }
+
+    @GetMapping("evaluate_warehouse_item_amount")
+    @ResponseBody
+    public ServerResponse evaluateWarehouseItemAmount(HttpSession session,
+                                           Integer warehouseId,
+                                           Integer goodsId,
+                                           Integer amount) {
+        Producer producer = (Producer) session.getAttribute(Const.CURRENT_PRODUCER);
+        if (producer == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        return producerService.evaluateWarehouseItemAmount(warehouseId,goodsId,amount);
+    }
 }

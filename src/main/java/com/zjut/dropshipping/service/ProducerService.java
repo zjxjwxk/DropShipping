@@ -31,4 +31,11 @@ public interface ProducerService {
     ServerResponse getWarehouseList(Integer producerId);
 
     ServerResponse getDetailWarehouseList(String country);
+
+    ServerResponse changeWarehouseItemAmount(Integer warehouseId,Integer goodsId,Integer amountChange);
+
+    ServerResponse addWarehouseItem(Integer warehouseId,Integer goodsId,Integer amount);
+
+    ServerResponse evaluateWarehouseItemAmount(Integer warehouseId,Integer goodsId,Integer amount);
+
 }
