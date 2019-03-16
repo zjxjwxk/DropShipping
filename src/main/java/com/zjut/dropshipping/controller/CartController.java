@@ -31,7 +31,7 @@ public class CartController {
         if (agent == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
         }
-        return cartService.getList(agent.getId());
+        return cartService.getList(agent.getId(), agent.getRegion());
     }
 
     @PostMapping("/add")

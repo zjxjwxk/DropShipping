@@ -7,6 +7,7 @@ import com.zjut.dropshipping.dto.ShoppingCartItemListDTO;
 import com.zjut.dropshipping.dto.SpecificationDTO;
 import com.zjut.dropshipping.repository.*;
 import com.zjut.dropshipping.service.CartService;
+import com.zjut.dropshipping.service.ExchangeRateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,26 +28,30 @@ public class CartServiceImpl implements CartService {
     private final SpecificationRepository specificationRepository;
     private final ProducerRepository producerRepository;
 
+    private final ExchangeRateService exchangeRateService;
+
     @Autowired
     public CartServiceImpl(CartRepository cartRepository,
                            GoodsSpecItemRepository goodsSpecItemRepository,
                            GoodsRepository goodsRepository,
                            SpecificationRepository specificationRepository,
-                           ProducerRepository producerRepository) {
+                           ProducerRepository producerRepository,
+                           ExchangeRateService exchangeRateService) {
         this.cartRepository = cartRepository;
         this.goodsSpecItemRepository = goodsSpecItemRepository;
         this.goodsRepository = goodsRepository;
         this.specificationRepository = specificationRepository;
         this.producerRepository = producerRepository;
+        this.exchangeRateService = exchangeRateService;
     }
 
     @Override
-    public ServerResponse getList(Integer agentId) {
+    public ServerResponse getList(Integer agentId, String country) {
         List<ShoppingCart> shoppingCartList = cartRepository.findByAgentId(agentId);
         if (shoppingCartList.size() == 0) {
             return ServerResponse.createByErrorMessage("购物车中还没有商品");
         }
-        return ServerResponse.createBySuccess(this.getShoppingCartMap(shoppingCartList));
+        return ServerResponse.createBySuccess(this.getShoppingCartMap(country, shoppingCartList));
     }
 
     @Override
@@ -83,7 +88,7 @@ public class CartServiceImpl implements CartService {
         }
     }
 
-    private Map<Integer, ShoppingCartItemListDTO> getShoppingCartMap(List<ShoppingCart> shoppingCartList) {
+    private Map<Integer, ShoppingCartItemListDTO> getShoppingCartMap(String country, List<ShoppingCart> shoppingCartList) {
         Map<Integer, ShoppingCartItemListDTO> shoppingCartMap = new HashMap<>(5);
         for (ShoppingCart shoppingCart :
                 shoppingCartList) {
@@ -112,6 +117,10 @@ public class CartServiceImpl implements CartService {
 
                 shoppingCartItemDTO.setAmount(shoppingCart.getAmount());
             }
+
+            // 根据汇率转换为对应货币价格
+            shoppingCartItemDTO.setPrice(exchangeRateService.getExchangePrice(country, shoppingCartItemDTO.getPrice()));
+
             shoppingCartItemDTO.setSpecificationDTOList(specificationDTOList);
 
             // 将购物车条目列表根据厂家id放入Map
