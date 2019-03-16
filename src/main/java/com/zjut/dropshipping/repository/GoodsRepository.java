@@ -25,4 +25,7 @@ public interface GoodsRepository extends JpaRepository<Goods, Integer> {
 
     @Query(value = "select price from goods where goods_id = ?1",nativeQuery = true)
     Double findPriceByGoodId(Integer goodsId);
+
+    @Query(value = "select name from goods where goods_id = ?1",nativeQuery = true)
+    String findNameByGoodsId(Integer goodsId);
 }

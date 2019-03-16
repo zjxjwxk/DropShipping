@@ -32,6 +32,8 @@ public class ProducerServiceImpl implements ProducerService {
     private final GoodsRepository goodsRepository;
     private final GoodsSpecItemRepository goodsSpecItemRepository;
     private final OrderItemRepository orderItemRepository;
+    private final WarehouseItemRepository warehouseItemRepository;
+    private final WarehouseRepository warehouseRepository;
     @Autowired
     public ProducerServiceImpl(ProducerRepository producerRepository,
                                AgentRepository agentRepository,
@@ -41,7 +43,9 @@ public class ProducerServiceImpl implements ProducerService {
                                CategoryRepository categoryRepository,
                                GoodsRepository goodsRepository,
                                GoodsSpecItemRepository goodsSpecItemRepository,
-                               OrderItemRepository orderItemRepository) {
+                               OrderItemRepository orderItemRepository,
+                               WarehouseItemRepository warehouseItemRepository,
+                               WarehouseRepository warehouseRepository) {
         this.producerRepository = producerRepository;
         this.agentRepository = agentRepository;
         this.orderRepository = orderRepository;
@@ -51,6 +55,8 @@ public class ProducerServiceImpl implements ProducerService {
         this.goodsRepository = goodsRepository;
         this.goodsSpecItemRepository = goodsSpecItemRepository;
         this.orderItemRepository = orderItemRepository;
+        this.warehouseItemRepository = warehouseItemRepository;
+        this.warehouseRepository = warehouseRepository;
     }
 
     @Override
@@ -436,6 +442,88 @@ public class ProducerServiceImpl implements ProducerService {
         }
     }
 
+    @Override
+    public ServerResponse getWarehouseList(Integer producerId){
+        List<WarehouseListDTO> warehouseListDTOList = new ArrayList<>();
+        List<Warehouse> warehouseList =warehouseRepository.findByProducerIdGroupByCountry(producerId);
+        for (Warehouse warehouse :
+                warehouseList) {
+            WarehouseListDTO warehouseListDTO=new WarehouseListDTO();
+
+            warehouseListDTO.setCountry(warehouse.getCountry());
+            warehouseListDTO.setWarehouseId(warehouseRepository.findIdByCountry(warehouse.getCountry()));
+
+            warehouseListDTOList.add(warehouseListDTO);
+        }
+        return ServerResponse.createBySuccess(warehouseListDTOList);
+    }
+
+
+    @Override
+    public ServerResponse getDetailWarehouseList(String country){
+        List<DetailWarehouseListDTO> detailWarehouseListDTOList = new ArrayList<>();
+        List<Warehouse> warehouseList =warehouseRepository.findByCountry(country);
+        for (Warehouse warehouse :
+                warehouseList) {
+            DetailWarehouseListDTO detailWarehouseListDTO=new DetailWarehouseListDTO();
+
+
+            List<WarehouseGoodsListDTO> warehouseGoodsListDTOList=new ArrayList<>();
+            List<WarehouseItem> warehouseItemList =warehouseItemRepository.findByWarehouseId(warehouse.getId());
+            for(WarehouseItem warehouseItem:
+                    warehouseItemList){
+                WarehouseGoodsListDTO warehouseGoodsListDTO=new WarehouseGoodsListDTO();
+                warehouseGoodsListDTO.setGoodsId(warehouseItem.getGoodsId());
+                warehouseGoodsListDTO.setAmount(warehouseItem.getAmount());
+                warehouseGoodsListDTO.setGoodsName(goodsRepository.findNameByGoodsId(warehouseItem.getGoodsId()));
+                warehouseGoodsListDTOList.add(warehouseGoodsListDTO);
+            }
+
+            detailWarehouseListDTO.setId(warehouse.getId());
+            detailWarehouseListDTO.setGoodsList(warehouseGoodsListDTOList);
+
+            detailWarehouseListDTOList.add(detailWarehouseListDTO);
+        }
+        return ServerResponse.createBySuccess(detailWarehouseListDTOList);
+    }
+
+    @Override
+    public ServerResponse changeWarehouseItemAmount(Integer warehouseId,Integer goodsId,Integer amountChange){
+        WarehouseItem warehouseItem = warehouseItemRepository.findByWarehouseIdAndGoodsId(warehouseId,goodsId);
+        warehouseItem.setAmount(warehouseItem.getAmount()+ amountChange);
+        warehouseItemRepository.save(warehouseItem);
+        return  ServerResponse.createBySuccessMessage("更改成功");
+    }
+
+    @Override
+    public ServerResponse addWarehouseItem(Integer warehouseId,Integer goodsId,Integer amount){
+        WarehouseItem warehouseItemExit = warehouseItemRepository.findByWarehouseIdAndGoodsId(warehouseId,goodsId);
+        WarehouseItem warehouseItem = new WarehouseItem();
+        if(warehouseItemExit == null){
+            warehouseItem.setWarehouseId(warehouseId);
+            warehouseItem.setGoodsId(goodsId);
+            warehouseItem.setAmount(amount);
+            warehouseItemRepository.save(warehouseItem);
+            return  ServerResponse.createBySuccessMessage("添加成功");
+        }else{
+            warehouseItem.setAmount(warehouseItem.getAmount()+ amount);
+            warehouseItemRepository.save(warehouseItem);
+            return  ServerResponse.createBySuccessMessage("添加成功");
+        }
+
+
+    }
+
+    @Override
+    public ServerResponse evaluateWarehouseItemAmount(Integer warehouseId,Integer goodsId,Integer amount){
+        WarehouseItem warehouseItem = warehouseItemRepository.findByWarehouseIdAndGoodsId(warehouseId,goodsId);
+        if(warehouseItem.getAmount()>= amount ){
+            return  ServerResponse.createBySuccessMessage("商品数量足够");
+        }else{
+            return  ServerResponse.createBySuccessMessage("商品数量不足");
+        }
+
+    }
 
 
 }
