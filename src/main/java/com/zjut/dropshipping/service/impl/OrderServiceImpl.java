@@ -31,6 +31,8 @@ public class OrderServiceImpl implements OrderService {
     private final RefundStatusRepository refundStatusRepository;
     private final EvaluationRepository evaluationRepository;
     private final GoodsEvaluationRepository goodsEvaluationRepository;
+    private final CountryCurrencyRepository countryCurrencyRepository;
+    private final ExchangeRateRepository exchangeRateRepository;
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
@@ -44,7 +46,9 @@ public class OrderServiceImpl implements OrderService {
                             AgentRepository agentRepository,
                             RefundStatusRepository refundStatusRepository,
                             EvaluationRepository evaluationRepository,
-                            GoodsEvaluationRepository goodsEvaluationRepository) {
+                            GoodsEvaluationRepository goodsEvaluationRepository,
+                            CountryCurrencyRepository countryCurrencyRepository,
+                            ExchangeRateRepository exchangeRateRepository) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
         this.goodsRepository = goodsRepository;
@@ -57,6 +61,8 @@ public class OrderServiceImpl implements OrderService {
         this.refundStatusRepository = refundStatusRepository;
         this.evaluationRepository = evaluationRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
+        this.countryCurrencyRepository = countryCurrencyRepository;
+        this.exchangeRateRepository = exchangeRateRepository;
     }
 
 
@@ -271,7 +277,7 @@ public class OrderServiceImpl implements OrderService {
             buyer.setAddress(null);
             orderDTO.setBuyer(buyer);
 
-            orderDTO.setOrderItemList(this.getOrderItemDTOList(orderItemList));
+            orderDTO.setOrderItemList(this.getOrderItemDTOList(agentRepository.findOneById(order.getOrderId()).getRegion(), orderItemList));
 
             if (logistic != null) {
                 logistic.setOrderId(null);
@@ -304,7 +310,8 @@ public class OrderServiceImpl implements OrderService {
             buyer.setAddress(null);
             producerOrderDTO.setBuyer(buyer);
 
-            producerOrderDTO.setOrderItemList(this.getOrderItemDTOList(orderItemList));
+
+            producerOrderDTO.setOrderItemList(this.getOrderItemDTOList(agentRepository.findOneById(order.getOrderId()).getRegion(), orderItemList));
 
             if (logistic != null) {
                 logistic.setOrderId(null);
@@ -320,7 +327,7 @@ public class OrderServiceImpl implements OrderService {
         return producerOrderDTOList;
     }
 
-    private List<OrderItemDTO> getOrderItemDTOList(List<OrderItem> orderItemList) {
+    private List<OrderItemDTO> getOrderItemDTOList(String country, List<OrderItem> orderItemList) {
         List<OrderItemDTO> orderItemDTOList = new ArrayList<>();
         for (OrderItem orderItem :
                 orderItemList) {
@@ -340,6 +347,11 @@ public class OrderServiceImpl implements OrderService {
 
                 orderItemDTO.addPrice(goodsSpecItem.getPriceDifference());
             }
+
+            // 根据汇率转换为对应货币价格
+            CountryCurrency countryCurrency = countryCurrencyRepository.findByCountry(country);
+            ExchangeRate exchangeRate = exchangeRateRepository.findByName(countryCurrency.getCurrency());
+            orderItemDTO.setPrice(orderItemDTO.getPrice() / exchangeRate.getRate());
 
             orderItemDTO.setGoodsId(goods.getGoodsId());
             orderItemDTO.setSpecificationList(specificationDTOList);
