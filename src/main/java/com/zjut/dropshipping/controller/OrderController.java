@@ -135,6 +135,20 @@ public class OrderController {
         return Const.AlipayCallback.RESPONSE_FAILED;
     }
 
+    @GetMapping("query_order_pay_state")
+    @ResponseBody
+    public ServerResponse<Boolean> queryOrderPayStatus(HttpSession session, Integer orderId) {
+        Agent agent = (Agent) session.getAttribute(Const.CURRENT_AGENT);
+        if (agent == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+        }
+        ServerResponse serverResponse = orderService.queryOrderPayStatus(agent.getId(), orderId);
+        if (serverResponse.isSuccess()) {
+            return ServerResponse.createBySuccess(true);
+        }
+        return ServerResponse.createBySuccess(false);
+    }
+
     @GetMapping("/producer_get_order_list")
     @ResponseBody
     public ServerResponse producerGetOrderList(HttpSession session) {

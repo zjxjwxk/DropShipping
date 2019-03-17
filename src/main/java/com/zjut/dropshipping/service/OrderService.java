@@ -26,6 +26,8 @@ public interface OrderService {
 
     ServerResponse aliCallback(Map<String, String> params);
 
+    ServerResponse queryOrderPayStatus(Integer agentId, Integer orderId);
+
     ServerResponse orderStateReceive(Integer orderId);
 
     ServerResponse orderStateReject(Integer orderId);

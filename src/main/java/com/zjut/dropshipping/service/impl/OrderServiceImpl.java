@@ -298,6 +298,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public ServerResponse queryOrderPayStatus(Integer agentId, Integer orderId) {
+        Order order = orderRepository.findByAgentIdAndOrderId(agentId, orderId);
+        if (order == null) {
+            return ServerResponse.createByErrorMessage("用户没有该订单");
+        }
+        if (order.getState().equals(Const.OrderState.TO_BE_CONFIRMED)) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+    }
+
+    @Override
     public ServerResponse producerGetOrderList(Integer producerId) {
         List<Order> orderList = orderRepository.findByProducerId(producerId);
         if (orderList.size() == 0) {
