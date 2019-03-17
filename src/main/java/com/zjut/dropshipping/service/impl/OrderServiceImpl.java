@@ -539,7 +539,7 @@ public class OrderServiceImpl implements OrderService {
             producerOrderDTO.setBuyer(buyer);
 
 
-            producerOrderDTO.setOrderItemList(this.getOrderItemDTOList(agentRepository.findOneById(order.getAgentId()).getRegion(), orderItemList));
+            producerOrderDTO.setOrderItemList(this.getOrderItemDTOList(producerRepository.findOneById(order.getProducerId()).getRegion(), orderItemList));
 
             if (logistic != null) {
                 logistic.setOrderId(null);
