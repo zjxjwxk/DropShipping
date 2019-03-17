@@ -310,7 +310,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ServerResponse producerGetOrderList(Integer producerId) {
+    public ServerResponse   producerGetOrderList(Integer producerId) {
         List<Order> orderList = orderRepository.findByProducerId(producerId);
         if (orderList.size() == 0) {
             return ServerResponse.createByErrorMessage("暂无订单");
@@ -505,7 +505,7 @@ public class OrderServiceImpl implements OrderService {
             buyer.setAddress(null);
             orderDTO.setBuyer(buyer);
 
-            orderDTO.setOrderItemList(this.getOrderItemDTOList(agentRepository.findOneById(order.getOrderId()).getRegion(), orderItemList));
+            orderDTO.setOrderItemList(this.getOrderItemDTOList(agentRepository.findOneById(order.getAgentId()).getRegion(), orderItemList));
 
             if (logistic != null) {
                 logistic.setOrderId(null);
@@ -539,7 +539,7 @@ public class OrderServiceImpl implements OrderService {
             producerOrderDTO.setBuyer(buyer);
 
 
-            producerOrderDTO.setOrderItemList(this.getOrderItemDTOList(agentRepository.findOneById(order.getOrderId()).getRegion(), orderItemList));
+            producerOrderDTO.setOrderItemList(this.getOrderItemDTOList(agentRepository.findOneById(order.getAgentId()).getRegion(), orderItemList));
 
             if (logistic != null) {
                 logistic.setOrderId(null);
