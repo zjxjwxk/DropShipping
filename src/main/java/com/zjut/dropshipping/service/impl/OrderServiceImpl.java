@@ -55,8 +55,6 @@ public class OrderServiceImpl implements OrderService {
     private final RefundStatusRepository refundStatusRepository;
     private final EvaluationRepository evaluationRepository;
     private final GoodsEvaluationRepository goodsEvaluationRepository;
-    private final CountryCurrencyRepository countryCurrencyRepository;
-    private final ExchangeRateRepository exchangeRateRepository;
 
     private final ExchangeRateService exchangeRateService;
 
@@ -73,8 +71,6 @@ public class OrderServiceImpl implements OrderService {
                             RefundStatusRepository refundStatusRepository,
                             EvaluationRepository evaluationRepository,
                             GoodsEvaluationRepository goodsEvaluationRepository,
-                            CountryCurrencyRepository countryCurrencyRepository,
-                            ExchangeRateRepository exchangeRateRepository,
                             ExchangeRateService exchangeRateService) {
         this.orderRepository = orderRepository;
         this.buyerRepository = buyerRepository;
@@ -88,8 +84,6 @@ public class OrderServiceImpl implements OrderService {
         this.refundStatusRepository = refundStatusRepository;
         this.evaluationRepository = evaluationRepository;
         this.goodsEvaluationRepository = goodsEvaluationRepository;
-        this.countryCurrencyRepository = countryCurrencyRepository;
-        this.exchangeRateRepository = exchangeRateRepository;
         this.exchangeRateService = exchangeRateService;
     }
 
@@ -152,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ServerResponse pay(Integer agentId, Integer orderId, String path) {
-        Map<String, String> resultMap = new HashMap<>();
+        Map<String, String> resultMap = new HashMap<>(2);
         Order order = orderRepository.findByAgentIdAndOrderId(agentId, orderId);
         if (order == null) {
             return ServerResponse.createByErrorMessage("用户没有该订单");
@@ -645,7 +639,7 @@ public class OrderServiceImpl implements OrderService {
             return ServerResponse.createByErrorMessage("请评价");
         }
         evaluationDTO.setContent(evaluation.getContent());
-        evaluationDTO.setCreateTime(evaluation.getCreateTime());;
+        evaluationDTO.setCreateTime(evaluation.getCreateTime());
         evaluationDTO.setLevel(evaluation.getLevel());
         return  ServerResponse.createBySuccess(evaluationDTO);
     }
