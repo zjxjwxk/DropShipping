@@ -117,7 +117,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setBuyerId(buyer.getId());
         order.setProducerId(goodsRepository.findByGoodsId(orderItemList[0].getGoodsId()).getProducerId());
-        order.setState(Const.OrderState.TO_BE_CONFIRMED);
+        order.setState(Const.OrderState.TO_BE_PAID);
         order.setRemark(remark);
 
         order = orderRepository.save(order);
