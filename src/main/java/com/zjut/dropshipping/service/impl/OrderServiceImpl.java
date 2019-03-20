@@ -300,10 +300,10 @@ public class OrderServiceImpl implements OrderService {
         if (order == null) {
             return ServerResponse.createByErrorMessage("用户没有该订单");
         }
-        if (order.getState().equals(Const.OrderState.TO_BE_CONFIRMED)) {
-            return ServerResponse.createBySuccess();
+        if (order.getState().equals(Const.OrderState.TO_BE_PAID)) {
+            return ServerResponse.createByError();
         }
-        return ServerResponse.createByError();
+        return ServerResponse.createBySuccess();
     }
 
     @Override
