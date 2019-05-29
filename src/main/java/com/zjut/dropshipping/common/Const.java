@@ -2,15 +2,16 @@ package com.zjut.dropshipping.common;
 
 /**
  * 常量类
+ *
  * @author zjxjwxk
  */
 public class Const {
 
     public static final String CURRENT_AGENT = "currentAgent";
     public static final String CURRENT_PRODUCER = "currentProducer";
-  
+
     public static final String PRODUCERTOAGENT = "1";
-    
+
     public static final String PHONE = "phone";
     public static final String IDENTITY_NUMBER = "identityNumber";
     public static final String EXTERNAL_SHOP = "externalShop";
@@ -93,7 +94,7 @@ public class Const {
         String QRCODE = "QRCode";
     }
 
-    public interface AlipayCallback{
+    public interface AlipayCallback {
         String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";
         String TRADE_STATUS_TRADE_SUCCESS = "TRADE_SUCCESS";
 
